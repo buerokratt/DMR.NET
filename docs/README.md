@@ -10,3 +10,6 @@ This user story is for the expansion of requirements and technical design of the
 - [ ] Cover the flow of managing participants of Bürokratt´s ecosystem
 - [ ] Cover the flow where user request needs to be classified
 - [ ] Cover the flow where classified request gets sent to appropriate bot
+
+## Participants
+![DMR participants](../images/dmr-participants.editable.png)
