@@ -21,29 +21,29 @@
 
 ### Membership management
 
-> `/membership-management/chatbots` and `/membership-management/dmrs` may be useful for clients themselves, for example to add an extra layer of monitoring, validation etc
+> <br>`/membership-management/chatbots` and `/membership-management/dmrs` may be useful for clients themselves, for example to add an extra layer of monitoring, validation etc<br><br>
 
 | **Service**                                  | **Resource**                                | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |----------------------------------------------|---------------------------------------------|------------|--------------------------|-----------------|------------------|
-| Get a list of all registered chatbots        | /membership-management/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         | _TBA_            |
-| Register a membership of a new instance      | /membership-management/chatbots/{client-id} | POST       | Chatbot                  | CentOps         | _TBA_            |
-| Update membership information of an instance | /membership-management/chatbots/{client-id} | PUT        | Chatbot                  | CentOps         | _TBA_            |
-| Announce revoking membership                 | /membership-management/chatbots/{client-id} | DELETE     | Chatbot                  | CentOps         | _TBA_            |
-| Get a list of all registered DMRs            | /membership-management/dmrs                 | GET        | DMR, Chatbot, Classifier | CentOps         | _TBA_            |
-| Register a membership of a new instance      | /membership-management/dmrs/{client-id}     | POST       | DMR                      | CentOps         | _TBA_            |
-| Update membership information of an instance | /membership-management/dmrs/{client-id}     | PUT        | DMR                      | CentOps         | _TBA_            |
-| Announce revoking membership                 | /membership-management/dmrs/{client-id}     | DELETE     | DMR                      | CentOps         | _TBA_            |
+| Get a list of all registered chatbots        | /membership-management/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         |             |
+| Register a membership of a new instance      | /membership-management/chatbots/{client-id} | POST       | Chatbot                  | CentOps         |             |
+| Update membership information of an instance | /membership-management/chatbots/{client-id} | PUT        | Chatbot                  | CentOps         |             |
+| Announce revoking membership                 | /membership-management/chatbots/{client-id} | DELETE     | Chatbot                  | CentOps         |             |
+| Get a list of all registered DMRs            | /membership-management/dmrs                 | GET        | DMR, Chatbot, Classifier | CentOps         |             |
+| Register a membership of a new instance      | /membership-management/dmrs/{client-id}     | POST       | DMR                      | CentOps         |             |
+| Update membership information of an instance | /membership-management/dmrs/{client-id}     | PUT        | DMR                      | CentOps         |             |
+| Announce revoking membership                 | /membership-management/dmrs/{client-id}     | DELETE     | DMR                      | CentOps         |             |
 
 ### Status information
 
 | **Service**                                       | **Resource**                 | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |---------------------------------------------------|------------------------------|------------|--------------------------|-----------------|------------------|
-| Get status information of all registered chatbots | /status/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         | _TBA_            |
-| Get status information of a specific chatbot      | /status/chatbots/{client-id} | GET        | Chatbot, DMR, Classifier | CentOps         | _TBA_            |
-| Update status information of a specific chatbot   | /status/chatbots/{client-id} | PUT        | CentOps                  | CentOps         | _TBA_            |
-| Get status information of all registered DMRs     | /status/dmrs                 | GET        | Chatbot, DMR, Classifier | CentOps         | _TBA_            |
-| Get status information of a specific DMR          | /status/dmrs/{client-id}     | GET        | Chatbot, DMR, Classifier | CentOps         | _TBA_            |
-| Update status information of a specific DMR       | /status/dmrs/{client-id}     | PUT        | CentOps                  | CentOps         | _TBA_            |
+| Get status information of all registered chatbots | /status/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         |             |
+| Get status information of a specific chatbot      | /status/chatbots/{client-id} | GET        | Chatbot, DMR, Classifier | CentOps         |             |
+| Update status information of a specific chatbot   | /status/chatbots/{client-id} | PUT        | CentOps                  | CentOps         |             |
+| Get status information of all registered DMRs     | /status/dmrs                 | GET        | Chatbot, DMR, Classifier | CentOps         |             |
+| Get status information of a specific DMR          | /status/dmrs/{client-id}     | GET        | Chatbot, DMR, Classifier | CentOps         |             |
+| Update status information of a specific DMR       | /status/dmrs/{client-id}     | PUT        | CentOps                  | CentOps         |             |
 
 ### Software management
 
@@ -85,7 +85,7 @@
 
 ## Requests by CentOps
 
-> **_TO CLARIFY:_** On this image, "_many optional_ Chatbots 1-N" and "_exactly one_ Chatbot" are making requests to CentOps. Both "Chatbots 1-N" and "Chatbot" should actually be treated the same way but as we treat "Chatbot" separately throughout this document, such difference is used.
+> <br>**_TO CLARIFY:_** On this image, "_many optional_ Chatbots 1-N" and "_exactly one_ Chatbot" are making requests to CentOps. Both "Chatbots 1-N" and "Chatbot" should actually be treated the same way but as we treat "Chatbot" separately throughout this document, such difference is used.<br><br>
 
 <br>
 
@@ -104,9 +104,18 @@
 
 # Chat flow
 ## Initial request from the Client
+
+> <br>Out of scope of DMR development. Use just a simple curl to test mock chats.<br><br>
+
 <br>
 
 ![DMR participants](./images/design-architecture-for-dmr-related-services/client-request.editable.png)
+
+| **Service**           | **Resource**     | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|-----------------------|------------------|------------|-------------------|-----------------|------------------|
+| Client initiates chat |                  |            |                   |                 |                  |
+| Client sends message  | /chats/{chat-id} | POST       | Client            | Chatbot         |                  |
+| Client ends chat      |                  |            |                   |                 |                  |
 
 - Client sends a request to any member of Bürokratt`s ecosystem
 - Client does not have to know which chatbot is the right one to answer him/her
@@ -119,10 +128,30 @@
 
 ![Chatbot to DMR](./images/design-architecture-for-dmr-related-services/chatbot-to-dmr.editable.png)
 
+| **Service**                      | **Resource**  | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|----------------------------------|---------------|------------|-------------------|-----------------|------------------|
+| Send unclassified message to DMR | /unclassified | POST       | Chatbot           | DMR             |                  |
+
 - A local Chatbot that the Client turned to is unable to find an appropriate answer
 - In all such cases, an initial request is passed on to DMR which has to know what to do next
 
-> DMR is unable to read the content of `payload`
+> <br>DMR is unable to read the content of `payload`<br><br>
+
+
+## Chatbot continues an ongoing conversation
+<br>
+
+![Chatbot to DMR](./images/design-architecture-for-dmr-related-services/chatbot-to-dmr.editable.png)
+
+| **Service**                               | **Resource**                                      | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|-------------------------------------------|---------------------------------------------------|------------|-------------------|-----------------|------------------|
+| Send classified, follow-up message to DMR | /conversations/{participant-id}/{conversation-id} | POST       | Chatbot           | DMR             |                  |
+
+- A local Chatbot is used to continue the conversation even if the response comes from some other Chatbot instances
+- `{participant-id}` and `{conversation-id}` are mandatory to be sent by Chatbot in order to prevent keeping state at DMR
+- In all such cases, a request is passed on to DMR, which has to know what to do next - in this case, `{participant-id}` is already pre-defined as a recipient, so passing this message to Classifier is unnecessary
+
+> <br>DMR is unable to read the content of `payload`<br><br>
 
 
 ## DMR sends the request to Classifier
@@ -130,9 +159,15 @@
 
 ![DMR to Classifier](./images/design-architecture-for-dmr-related-services/dmr-to-classifier.editable.png)
 
-- If it`s an initial request (neither classified or responded by another bot), it always gets sent to Classifier
+| **Service**                                   | **Resource**           | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|-----------------------------------------------|------------------------|------------|-------------------|-----------------|------------------|
+| Send a message payload to be classified       | /inputs                | POST       | DMR               | Classifier      |                  |
+| Get the result for already classified content | /inputs/{content-hash} | GET        | DMR               | Classifier      |                  |
 
-> DMR is unable to read the content of `payload`
+- If it`s an initial request (neither classified or responded by another bot), it always gets sent to Classifier
+- Classifier stores cached results, which can be accessed by exact match of content hash
+
+> <br>DMR is unable to read the content of `payload`<br><br>
 
 
 ## Classifier responds with a name of a proper participant
@@ -140,22 +175,33 @@
 
 ![Classifier to DMR](./images/design-architecture-for-dmr-related-services/classifier-to-dmr.editable.png)
 
-- Although Classifier is part of Bürokratt`s core services, it`s treated as a third-party service
-- Classifier responds with a _name_ of the participant that should be able to respond to given request
+| **Service**                                   | **Resource** | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|-----------------------------------------------|--------------|------------|-------------------|-----------------|------------------|
+| Respond to DMR with a classified participant  | /classified  | POST       | Classifier        | DMR             |                  |
+
+- Although Classifier is part of Bürokratt core services, it`s treated as a third-party service
+- Classifier responds with a _name_ of the participant (`{participant-id}`) that should be able to respond to given request
 - Classifier has no knowledge about what should or will be done with its response afterwards
+- Resource would be `/classified` instead of `/conversations` as it´s not up to Classifier to know/decide if its response is for conversations or something else
 
-> Classifier is able to read the content of `payload`
+> <br>Classifier is able to read the content of `payload`<br><br>
 
-> In case of multiple institutions, Classifier makes separate requests for all of them
+> <br>In case of multiple institutions, Classifier makes separate requests for all of them<br><br>
 
 ## DMR sends the request to proper participant
 <br>
 
 ![DMR to third party chatbots](./images/design-architecture-for-dmr-related-services/dmr-to-third-party-chatbots.editable.png)
 
-> CentOps continuously provides DMR information about which institution keywords (`Chatbot_A` = `https://private.chatbot_a/message-from-dmr` in this case) correspond to which endpoints
+| **Service**                                          | **Resource**                                      | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|------------------------------------------------------|---------------------------------------------------|------------|-------------------|-----------------|------------------|
+| Send a message to an appropriate third-party Chatbot | /conversations/{participant-id}/{conversation-id} | POST       | DMR               | Chatbot 1-N     |                  |
 
-> DMR is unable to read the content of `payload`
+- `{conversation-id}` has been initially passed on by Chatbot (chat initiator), DMR itself does not create/store this kind of state
+
+> <br>CentOps continuously provides DMR information about which institution keywords (`Chatbot_A` = `https://private.chatbot_a/message-from-dmr` in this case) correspond to which endpoints<br><br>
+
+> <br>DMR is unable to read the content of `payload`<br><br>
 
 
 ## Third-party chatbot responds to DMR
@@ -163,11 +209,14 @@
 
 ![Third-party chatbot to DMR](./images/design-architecture-for-dmr-related-services/third-party-chatbot-to-dmr.editable.png)
 
+| **Service**           | **Resource**                                      | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|-----------------------|---------------------------------------------------|------------|-------------------|-----------------|------------------|
+| Send a message to DMR | /conversations/{participant-id}/{conversation-id} | POST       | Chatbot 1-N       | DMR             |                  |
+
 - Any third-party chatbot acts as any other chatbot would regardless of if they`re requested by an actual Client, DMR or something else
-- As a request from Chatbot states a mandatori response URI (among other things), the response is sent to any of the DMRs currently active
 - This response may take from milliseconds to days (or even more)
 
-> DMR is unable to read the content of `payload`
+> <br>DMR is unable to read the content of `payload`<br><br>
 
 
 ## DMR responds to initial request
@@ -175,17 +224,25 @@
 
 ![DMR responds to initial request](./images/design-architecture-for-dmr-related-services/dmr-responds-to-initial-request.editable.png)
 
+| **Service**               | **Resource**                                      | **Method** | **Requests from** | **Requests to** | **OpenApi spec** |
+|---------------------------|---------------------------------------------------|------------|-------------------|-----------------|------------------|
+| Send a message to Chatbot | /conversations/{participant-id}/{conversation-id} | POST       | DMR               | Chatbot         |                  |
+
 - DMR passes its response to Chatbot
 - Business-wise, Chatbot treats responses from DMR the same way as it would treat its request to any of its backend services (local database for instance)
 
-> DMR is unable to read the content of `payload`
+> <br>DMR is unable to read the content of `payload`<br><br>
 
-> Request initiator (Chatbot) is able to read the content of `response.content`
+> <br>Request initiator (Chatbot) is able to read the content of `response.content`<br><br>
 
 
 ## Response to Client
 <br>
 
 ![Response to Client](./images/design-architecture-for-dmr-related-services/response-to-client.editable.png)
+
+| **Service**                     | **Resource**     | **Method**          | **Requests from** | **Requests to** | **OpenApi spec** |
+|---------------------------------|------------------|---------------------|-------------------|-----------------|------------------|
+| Client asks for message updates | /chats/{chat-id} | GET, SSE, WebSocket | Client            | Chatbot         |                  |
 
 - Local chatbot passes the response to Client
