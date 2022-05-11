@@ -21,7 +21,9 @@
 
 ### Membership management
 
-> <br>`/membership-management/chatbots` and `/membership-management/dmrs` may be useful for clients themselves, for example to add an extra layer of monitoring, validation etc<br><br>
+>Membership management is meant for the maintainer of CentOps to register new participants. Interested parties do not register themselves through API, but send an e-mail to CentOps maintainer, who uses the API to manage the actual registration.
+<br>`
+> /membership-management/chatbots` and `/membership-management/dmrs` may be useful for clients themselves, for example to add an extra layer of monitoring, validation etc<br><br>
 
 | **Service**                                  | **Resource**                                | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |----------------------------------------------|---------------------------------------------|------------|--------------------------|-----------------|------------------|
