@@ -15,6 +15,10 @@
 | Classifier      | A stand-alone service to detect which participant is the correct one to process given (user) input                                          | Mock                                         |                                 |
 
 ## Requests to CentOps
+
+> <br>CentOps is the central component to turn to by any participant to set up, maintain and/or remove their instance from Bürokratt ecosystem.<br>
+CentOps also receives and processes aggregated logs from all participants.<br><br>
+
 <br>
 
 ![Requests to Centops](./images/design-architecture-for-dmr-related-services/requests-to-centops.editable.png)
