@@ -16,7 +16,7 @@
 
 ## Requests to CentOps
 
-!!! Note CentOps is the central component to turn to by any participant to set up, maintain and/or remove their instances from Bürokratt ecosystem. It also expects, accepts and processes aggregated logs from all participants to monitor the ecosystem as a whole in order to initiate actions when needed.
+> Note CentOps is the central component to turn to by any participant to set up, maintain and/or remove their instances from Bürokratt ecosystem. It also expects, accepts and processes aggregated logs from all participants to monitor the ecosystem as a whole in order to initiate actions when needed.
 
 <br>
 
