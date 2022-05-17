@@ -16,7 +16,7 @@
 
 ## Requests to CentOps
 
-> <br>CentOps is the central component to turn to by any participant to set up, maintain and/or remove their instance from Bürokratt ecosystem. It also expects and processes aggregated logs from all participants to monitor the ecosystem as a whole in order to initiate actions when needed.<br><br>
+!!! Note CentOps is the central component to turn to by any participant to set up, maintain and/or remove their instances from Bürokratt ecosystem. It also expects, accepts and processes aggregated logs from all participants to monitor the ecosystem as a whole in order to initiate actions when needed.
 
 <br>
 
@@ -24,68 +24,39 @@
 
 ### Membership management
 
->Membership management is meant for the maintainer of CentOps to register new participants. Interested parties do not register themselves through API, but send an e-mail to CentOps maintainer, who uses the API to manage the actual registration.
-<br>`
-> /membership-management/chatbots` and `/membership-management/dmrs` may be useful for clients themselves, for example to add an extra layer of monitoring, validation etc<br><br>
-
 | **Service**                                  | **Resource**                                | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |----------------------------------------------|---------------------------------------------|------------|--------------------------|-----------------|------------------|
-| Get a list of all registered chatbots        | /membership-management/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         |             |
-| Register a membership of a new instance      | /membership-management/chatbots/{client-id} | POST       | Chatbot                  | CentOps         |             |
-| Update membership information of an instance | /membership-management/chatbots/{client-id} | PUT        | Chatbot                  | CentOps         |             |
-| Announce revoking membership                 | /membership-management/chatbots/{client-id} | DELETE     | Chatbot                  | CentOps         |             |
-| Get a list of all registered DMRs            | /membership-management/dmrs                 | GET        | DMR, Chatbot, Classifier | CentOps         |             |
-| Register a membership of a new instance      | /membership-management/dmrs/{client-id}     | POST       | DMR                      | CentOps         |             |
-| Update membership information of an instance | /membership-management/dmrs/{client-id}     | PUT        | DMR                      | CentOps         |             |
-| Announce revoking membership                 | /membership-management/dmrs/{client-id}     | DELETE     | DMR                      | CentOps         |             |
+| [Get a list of all registered participants](https://github.com/buerokratt/CentOps/issues/18)        | /membership-management<br>/membership-management/{participant-type}             | GET        | CentOps, Chatbot, DMR, Classifier | CentOps         |             |
+| [Register a membership of a new instance](https://github.com/buerokratt/CentOps/issues/19)      | /membership-management/{participant-type}/{client-id} | POST       | Chatbot, DMR, Classifier                  | CentOps         |             |
+| [Update membership information of an instance](https://github.com/buerokratt/CentOps/issues/20) | /membership-management/{participant-type}/{client-id} | PUT        | Chatbot, DMR, Classifier                  | CentOps         |             |
+| [Announce revoking membership](https://github.com/buerokratt/CentOps/issues/21)                 | /membership-management/{participant-type}/{client-id} | DELETE     | Chatbot, DMR, Classifier                  | CentOps         |             |
 
 ### Status information
 
 | **Service**                                       | **Resource**                 | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |---------------------------------------------------|------------------------------|------------|--------------------------|-----------------|------------------|
-| Get status information of all registered chatbots | /status/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         |             |
-| Get status information of a specific chatbot      | /status/chatbots/{client-id} | GET        | Chatbot, DMR, Classifier | CentOps         |             |
-| Update status information of a specific chatbot   | /status/chatbots/{client-id} | PUT        | CentOps                  | CentOps         |             |
-| Get status information of all registered DMRs     | /status/dmrs                 | GET        | Chatbot, DMR, Classifier | CentOps         |             |
-| Get status information of a specific DMR          | /status/dmrs/{client-id}     | GET        | Chatbot, DMR, Classifier | CentOps         |             |
-| Update status information of a specific DMR       | /status/dmrs/{client-id}     | PUT        | CentOps                  | CentOps         |             |
-
-### Software management
-
-| **Service**                                                       | **Resource**                                   | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
-|-------------------------------------------------------------------|------------------------------------------------|------------|--------------------------|-----------------|------------------|
-| List all services provided by Bürokratt                           | /software-management/services                  | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Update a list of all services provided by Bürokratt               | /software-management/services                  | PUT        | CentOps                  | CentOps         |                  |
-| Get detailed technical information to run chatbot as a service    | /software-management/services/chatbot          | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Update detailed technical information to run chatbot as a service | /software-management/services/chatbot          | PUT        | CentOps                  | CentOps         |                  |
-| Get detailed technical information to run DMR as a service        | /software-management/services/DMR              | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Update detailed technical information to run DMR as a service     | /software-management/services/DMR              | PUT        | CentOps                  | CentOps         |                  |
-| List all technical components used to provide Bürokratt services  | /software-management/components                | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Get detailed technical information about a specific component     | /software-management/components/{component-id} | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Update detailed technical information about a specific component  | /software-management/components/{component-id} | PUT        | CentOps                  | CentOps         |                  |
-
+| [Get status information of all registered participants](https://github.com/buerokratt/CentOps/issues/23) | /status/{participant-type}             | GET        | CentOps, Chatbot, DMR, Classifier | CentOps         |             |
+| [Get status information of a specific participant](https://github.com/buerokratt/CentOps/issues/24)      | /status/{participant-type}/{client-id} | GET        | CentOps, Chatbot, DMR, Classifier | CentOps         |             |
+| [Update status information of a specific participant](https://github.com/buerokratt/CentOps/issues/20)   | /status/{participant-type}/{client-id} | PUT        | Chatbot, DMR, Classifier                  | CentOps         |             |
 
 ### Planned outages
 
 | **Service**                                      | **Resource**                              | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |--------------------------------------------------|-------------------------------------------|------------|--------------------------|-----------------|------------------|
-| Get a list of all planned outages                | /services-management                      | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Update a list of all planned outages             | /services-management                      | PUT        | CentOps                  | CentOps         |                  |
-| Get a list of all planned outages of chatbots    | /services-management/chatbots             | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Update a list of all planned outages of chatbots | /services-management/chatbots             | PUT        | CentOps                  | CentOps         |                  |
-| Get planned outages of a specific chatbot        | /services-management/chatbots/{client-id} | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Notify about a planned outage                    | /services-management/chatbots/{client-id} | POST       | Chatbot                  | CentOps         |                  |
-| Update planned outages for a specific chatbot    | /services-management/chatbots/{client-id} | PUT        | CentOps                  | CentOps         |                  |
-| Get a list of all planned outages of DMRs        | /services-management/dmrs                 | GET        | Chatbot, DMR, Classifier | CentOps         |                  |
-| Notify about a planned outage                    | /services-management/chatbots/{client-id} | POST       | DMR                      | CentOps         |                  |
-| Update a list of all planned outages of DMRs     | /services-management/chatbots/{client-id} | PUT        | CentOps                  | CentOps         |                  |
+| [Get a list of all planned outages](https://github.com/buerokratt/CentOps/issues/30)                | /outage                      | GET        | CentOps, Chatbot, DMR, Classifier | CentOps         |                  |
+| Update a list of all planned outages             | /outage<br>/outage/{participant-type}                      | PUT        | CentOps                  | CentOps         |                  |
+| Get planned outages of a specific participant        | /outage/{participant-type}/{client-id} | GET        | CentOps, Chatbot, DMR, Classifier | CentOps         |                  |
+| Update planned outages of a specific chatbot    | /outage/{participant-type}/{client-id} | PUT        | CentOps                  | CentOps         |                  |
+| [Announce planned outage to network](https://github.com/buerokratt/CentOps/issues/29)                    | /outage/{participant-type}/{client-id} | POST       | CentOps, Chatbot, DMR, Classifier                  | CentOps         |                  |
+| [Notify participants of planned outages](https://github.com/buerokratt/CentOps/issues/31)                    | /outage/{participant-type}/{client-id} | POST       | CentOps                      | CentOps         |                  |
+| [Announce of returning to network](https://github.com/buerokratt/CentOps/issues/32)     |  |         |                   |          |                  |
 
 
 ### Sending logs
 
 | **Service**                                 | **Resource** | **Method** | **Requests from**        | **Requests to** | **OpenApi spec** |
 |---------------------------------------------|--------------|------------|--------------------------|-----------------|------------------|
-| Send aggregated logs for central monitoring |              |            | Chatbot, DMR, Classifier | CentOps         |                  |
+| [Send aggregated logs for central monitoring](https://github.com/buerokratt/CentOps/issues/28) |              |            | Chatbot, DMR, Classifier | CentOps         |                  |
 
 
 ## Requests by CentOps
@@ -103,8 +74,7 @@
 | Notify participants about optional software updates                    | /centops-communication/software-updates/optional     | POST       | CentOps           | Chatbot, DMR, Classifier |                  |
 | Notify participants about mandatory software updates                   | /centops-communication/software-updates/mandatory    | POST       | CentOps           | Chatbot, DMR, Classifier |                  |
 | Notify participants about critical software updates                    | /centops-communication/software-updates/critical     | POST       | CentOps           | Chatbot, DMR, Classifier |                  |
-| Update the list of chatbots                                            | /centops-communication/participants/chatbot          | POST       | CentOps           | DMR                      |                  |
-| Update the list of DMRs                                                | /centops-communication/participants/dmr              | POST       | CentOps           | Chatbot                  |                  |               |
+| Update the list of participants                                            | /centops-communication/participants/{participant-type}          | POST       | CentOps           | DMR                      |                  |
 
 
 # Chat flow
