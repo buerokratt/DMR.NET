@@ -1,11 +1,11 @@
 {
     "stryker-config": {
-      "test-projects": [ "./MockClassifier.UnitTests/MockClassifier.UnitTests.csproj" ],
+      "test-projects": [ "./DMR.Api.UnitTests/DMR.Api.UnitTests.csproj" ],
       "reporters": [
         "progress",
         "cleartext",
         "html"
       ],
-      "thresholds": { "high": 90, "low": 60, "break": 60 }
+      "thresholds": { "high": 90, "low": 60, "break": 0 }
     }  
   }
