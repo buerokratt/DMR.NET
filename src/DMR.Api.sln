@@ -1,11 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32413.511
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32505.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMR.Api", "DMR.Api\DMR.Api.csproj", "{2CD76DD8-6553-4F37-AFC2-B8C721EA18B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DMR.Api", "DMR.Api\DMR.Api.csproj", "{2CD76DD8-6553-4F37-AFC2-B8C721EA18B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DMR.Api.UnitTests", "DMR.Api.UnitTests\DMR.Api.UnitTests.csproj", "{58D6BB52-DF4E-4616-BD8C-EE797694BFFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DMR.Api.UnitTests", "DMR.Api.UnitTests\DMR.Api.UnitTests.csproj", "{58D6BB52-DF4E-4616-BD8C-EE797694BFFA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{48B9DFC9-8C2B-427A-9FB6-3DA9C43897CB}"
+	ProjectSection(SolutionItems) = preProject
+		CodeCoverage.runsettings = CodeCoverage.runsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
