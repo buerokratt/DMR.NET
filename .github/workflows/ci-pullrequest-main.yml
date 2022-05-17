@@ -38,6 +38,7 @@ jobs:
     - name: Copy Coverage output to root
       run: cp src/*.UnitTests/TestResults/**/coverage.cobertura.xml coverage.cobertura.xml
       
+      # TO DO: Threshold should be set to 80
     - name: Code Coverage Summary
       uses: irongut/CodeCoverageSummary@v1.2.0
       with:
@@ -45,7 +46,7 @@ jobs:
         fail_below_min: true
         format: markdown
         output: both
-        thresholds: '80'
+        thresholds: '0'
     
     - name: Upload Coverage Markdown Report
       uses: actions/upload-artifact@v3.0.0
