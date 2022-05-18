@@ -46,7 +46,7 @@ jobs:
         fail_below_min: true
         format: markdown
         output: both
-        thresholds: '0'
+        thresholds: '80'
     
     - name: Upload Coverage Markdown Report
       uses: actions/upload-artifact@v3.0.0
