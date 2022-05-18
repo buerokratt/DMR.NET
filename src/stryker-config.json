@@ -1,6 +1,6 @@
 {
     "stryker-config": {
-      "test-projects": [ "./DMR.Api.UnitTests/DMR.Api.UnitTests.csproj" ],
+      "test-projects": [ "./Dmr.UnitTests/Dmr.UnitTests.csproj" ],
       "reporters": [
         "progress",
         "cleartext",

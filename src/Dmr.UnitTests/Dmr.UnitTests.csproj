@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DMR.Api\DMR.Api.csproj" />
+    <ProjectReference Include="..\Dmr.Api\Dmr.Api.csproj" />
   </ItemGroup>
 
 </Project>
