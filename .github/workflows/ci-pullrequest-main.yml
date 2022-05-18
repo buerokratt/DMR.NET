@@ -33,12 +33,11 @@ jobs:
       run: dotnet publish *.sln --no-restore
      
     - name: Dotnet Test (unit tests only)
-      run: dotnet test /p:ExcludeByFile="**/program.cs" src/*.UnitTests/*.csproj --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test src/*.UnitTests/*.csproj --no-build --verbosity normal --collect:"XPlat Code Coverage"
       
     - name: Copy Coverage output to root
       run: cp src/*.UnitTests/TestResults/**/coverage.cobertura.xml coverage.cobertura.xml
       
-      # TO DO: Threshold should be set to 80
     - name: Code Coverage Summary
       uses: irongut/CodeCoverageSummary@v1.2.0
       with:
@@ -88,4 +87,4 @@ jobs:
       uses: docker/setup-buildx-action@v2
     
     - name: Docker Build
-      run: docker image build src/DMR.Api/
+      run: docker image build src/Dmr.Api/
