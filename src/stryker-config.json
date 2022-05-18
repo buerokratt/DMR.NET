@@ -6,6 +6,6 @@
         "cleartext",
         "html"
       ],
-      "thresholds": { "high": 90, "low": 60, "break": 0 }
+      "thresholds": { "high": 90, "low": 60, "break": 60 }
     }  
   }
