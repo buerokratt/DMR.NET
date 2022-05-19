@@ -32,7 +32,7 @@ namespace Dmr.UnitTests
         public void GetByIdReturnsExpected(int id)
         {
             // Act
-               var result = sut.Get(id);
+            var result = sut.Get(id);
 
             // Assert
             Assert.Equal(id.ToString(CultureInfo.CurrentCulture), result);
