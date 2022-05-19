@@ -5,7 +5,8 @@
 
 # Code files
 [*.{cs,vb}]
-
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+dotnet_analyzer_diagnostic.category-Naming.severity = warning
 
 # CA1000: Do not declare static members on generic types
 dotnet_diagnostic.CA1000.severity = warning
