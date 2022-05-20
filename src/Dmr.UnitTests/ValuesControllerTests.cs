@@ -1,4 +1,5 @@
 using Dmr.Api.Controllers;
+using System.Globalization;
 using Xunit;
 
 namespace Dmr.UnitTests
@@ -30,14 +31,11 @@ namespace Dmr.UnitTests
         [InlineData(10000000)]
         public void GetByIdReturnsExpected(int id)
         {
-            // Arrange
-            var expectedResult = "value";
-
             // Act
             var result = sut.Get(id);
 
             // Assert
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(id.ToString(CultureInfo.CurrentCulture), result);
         }
     }
 }

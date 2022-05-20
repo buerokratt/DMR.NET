@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Globalization;
 
 namespace Dmr.Api.Controllers
 {
@@ -19,7 +18,7 @@ namespace Dmr.Api.Controllers
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return "value";
+            return id.ToString(CultureInfo.CurrentCulture);
         }
     }
 }
