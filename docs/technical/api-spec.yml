@@ -5,7 +5,7 @@ info:
   license:
     name: MIT-0
     url: 'https://opensource.org/licenses/MIT'
-  description: A well-orchestrated high-performance dumb pipe acting as a proxy pass.
+  description: A well-orchestrated high-performance proxy pass.
 servers:
   - url: 'http://localhost:3000'
 paths:
