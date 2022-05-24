@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using Dmr.Api.Services.MessageForwarder;
+using Dmr.Api.Services.MessageForwarder.Extensions;
 
 namespace Dmr.Api
 {
@@ -15,6 +17,9 @@ namespace Dmr.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
+
+            var settings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
+            builder.Services.AddMessageForwarder(settings);
 
             var app = builder.Build();
 
