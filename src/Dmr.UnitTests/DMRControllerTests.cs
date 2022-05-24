@@ -1,4 +1,7 @@
 using Dmr.Api.Controllers;
+using Dmr.Api.Models;
+using Dmr.Api.Services.AsyncProcessor;
+using Moq;
 
 namespace Dmr.UnitTests
 {
@@ -8,7 +11,8 @@ namespace Dmr.UnitTests
 
         public DMRControllerTests()
         {
-            sut = new DmrController();
+            var processor = new Mock<IAsyncProcessorService<Message>>();
+            sut = new DmrController(processor.Object);
         }
     }
 }
