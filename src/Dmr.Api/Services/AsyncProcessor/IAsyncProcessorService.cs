@@ -5,8 +5,8 @@ namespace Dmr.Api.Services.AsyncProcessor
         /// <summary>
         /// Record the given request to be sent to the DMR API later
         /// </summary>
-        /// <param name="request">The request object</param>
-        void Enqueue(TPayload request);
+        /// <param name="payload">The payload object</param>
+        void Enqueue(TPayload payload);
 
         /// <summary>
         /// Begin processing requests

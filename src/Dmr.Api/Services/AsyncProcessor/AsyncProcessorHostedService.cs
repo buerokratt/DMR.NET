@@ -57,8 +57,7 @@ namespace Dmr.Api.Services.AsyncProcessor
                 return;
             }
 
-            var self = state as AsyncProcessorHostedService<TPayload>;
-            if (self == null)
+            if (state is not AsyncProcessorHostedService<TPayload> self)
             {
                 Trace.WriteLine($"Unable to start processor - state doesn't derive from AsyncProcessorHostedService<TPayload>");
                 return;

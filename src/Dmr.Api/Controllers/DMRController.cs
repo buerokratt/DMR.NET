@@ -5,17 +5,14 @@ namespace Dmr.Api.Controllers
 {
     [Route("/messages")]
     [ApiController]
-    public class DMRController : ControllerBase
+    public class DmrController : ControllerBase
     {
         [HttpPost]
         public IActionResult Post([FromBody] MessagesInput messages, [FromHeader] HeadersInput headers)
         {
-            if (messages == null || headers == null )
-            {
-                return BadRequest(ModelState);
-            }
-            return Accepted();
+            return (messages == null || headers == null)
+                ? BadRequest(ModelState)
+                : Accepted();
         }
-
     }
 }
