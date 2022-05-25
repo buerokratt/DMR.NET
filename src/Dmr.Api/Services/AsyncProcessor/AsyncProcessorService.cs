@@ -9,6 +9,8 @@ namespace Dmr.Api.Services.AsyncProcessor
 
         protected HttpClient HttpClient { get; }
 
+        protected TSettings Config { get; }
+
         protected ConcurrentQueue<TPayload> Requests { get; } = new();
 
         protected AsyncProcessorService(IHttpClientFactory httpClientFactory, TSettings config, ILogger logger)
@@ -24,6 +26,7 @@ namespace Dmr.Api.Services.AsyncProcessor
 
             HttpClient = httpClientFactory.CreateClient(config.ClientName);
             Logger = logger;
+            Config = config;
         }
 
         public void Enqueue(TPayload payload)

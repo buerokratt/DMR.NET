@@ -6,6 +6,7 @@ namespace Dmr.Api.Models
     [ExcludeFromCodeCoverage]
     public class MessagesInput
     {
+        public Uri? CallbackUri { get; set; }
         public IEnumerable<string>? Messages { get; set; }
     }
 }
