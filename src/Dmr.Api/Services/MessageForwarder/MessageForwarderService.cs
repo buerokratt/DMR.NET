@@ -49,7 +49,6 @@ namespace Dmr.Api.Services.MessageForwarder
                 return;
             }
 
-
             var participantEndpoint = string.Empty;
 
             try
