@@ -1,5 +1,6 @@
 using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
+using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
 
 namespace Dmr.Api.Services.MessageForwarder
@@ -9,12 +10,17 @@ namespace Dmr.Api.Services.MessageForwarder
     /// </summary>
     public class MessageForwarderService : AsyncProcessorService<Message, MessageForwarderSettings>
     {
+        private readonly ICentOps centOps;
+
         public MessageForwarderService(
             IHttpClientFactory httpClientFactory,
             MessageForwarderSettings config,
+            ICentOps centOps,
             ILogger<MessageForwarderService> logger) :
                 base(httpClientFactory, config, logger)
-        { }
+        {
+            this.centOps = centOps;
+        }
 
         public override async Task ProcessRequestAsync(Message payload)
         {

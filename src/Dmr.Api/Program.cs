@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder;
 using Dmr.Api.Services.MessageForwarder.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dmr.Api
 {
@@ -18,8 +20,13 @@ namespace Dmr.Api
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
 
-            var settings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
-            builder.Services.AddMessageForwarder(settings);
+            var dmrSettings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
+            builder.Services.AddMessageForwarder(dmrSettings);
+
+            // Add MockCentOps Configuration.
+            var mockCentOpsSettings = builder.Configuration.GetSection("MockCentOps").Get<MockCentOpsSettings>();
+            builder.Services.TryAddSingleton(mockCentOpsSettings);
+            _ = builder.Services.AddTransient<ICentOps, MockedCentOps>();
 
             var app = builder.Build();
 
