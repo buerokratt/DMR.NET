@@ -23,7 +23,7 @@ namespace Dmr.Api.Services.AsyncProcessor
             }
 
             HttpClient = httpClientFactory.CreateClient(config.ClientName);
-            this.Logger = logger;
+            Logger = logger;
         }
 
         public void Enqueue(TPayload payload)
@@ -33,9 +33,9 @@ namespace Dmr.Api.Services.AsyncProcessor
 
         public async Task ProcessRequestsAsync()
         {
-            while (this.Requests.TryDequeue(out var request))
+            while (Requests.TryDequeue(out var request))
             {
-                await this.ProcessRequestAsync(request).ConfigureAwait(true);
+                await ProcessRequestAsync(request).ConfigureAwait(true);
             }
         }
 

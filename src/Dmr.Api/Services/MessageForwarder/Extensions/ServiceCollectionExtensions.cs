@@ -27,6 +27,7 @@ namespace Dmr.Api.Services.MessageForwarder.Extensions
             });
 
             services.TryAddSingleton(settings);
+            services.TryAddSingleton(settings as AsyncProcessorSettings);
             services.TryAddSingleton<IAsyncProcessorService<Message>, MessageForwarderService>();
             _ = services.AddHostedService<AsyncProcessorHostedService<Message>>();
         }

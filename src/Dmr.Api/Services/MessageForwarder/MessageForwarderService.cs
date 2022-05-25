@@ -12,7 +12,7 @@ namespace Dmr.Api.Services.MessageForwarder
         public MessageForwarderService(
             IHttpClientFactory httpClientFactory,
             MessageForwarderSettings config,
-            ILogger logger) :
+            ILogger<MessageForwarderService> logger) :
                 base(httpClientFactory, config, logger)
         { }
 

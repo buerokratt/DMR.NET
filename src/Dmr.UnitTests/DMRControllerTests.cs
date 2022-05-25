@@ -5,11 +5,11 @@ using Moq;
 
 namespace Dmr.UnitTests
 {
-    public class DMRControllerTests
+    public class DmrControllerTests
     {
         private readonly DmrController sut;
 
-        public DMRControllerTests()
+        public DmrControllerTests()
         {
             var processor = new Mock<IAsyncProcessorService<Message>>();
             sut = new DmrController(processor.Object);
