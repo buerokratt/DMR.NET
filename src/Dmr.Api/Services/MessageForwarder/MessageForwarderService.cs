@@ -26,11 +26,11 @@ namespace Dmr.Api.Services.MessageForwarder
         {
             try
             {
-                if (payload == null)
+                if (payload == null || payload.Headers == null || payload.Messages == null)
                 {
                     throw new ArgumentNullException(nameof(payload));
                 }
-                if (payload.Headers != null && payload.Headers.XSentTo == "unclassified")
+                if (payload.Headers.XSentTo == "unclassified")
                 {
                     //pass in the callback uri in Messages                    
                     var response = await HttpClient.PostAsJsonAsync(Config.ClassifierUri, payload).ConfigureAwait(true);
