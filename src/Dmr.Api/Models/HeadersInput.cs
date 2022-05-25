@@ -11,7 +11,7 @@ namespace Dmr.Api.Models
         public string? XSentFrom { get; set; }
 
         [FromHeader(Name = "X-Send-To")]
-        public string? XSentTo { get; set; }
+        public string? XSendTo { get; set; }
 
         [FromHeader(Name = "X-Message-Id")]
         public string? XMessageId { get; set; }

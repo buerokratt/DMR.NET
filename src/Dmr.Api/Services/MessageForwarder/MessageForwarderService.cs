@@ -10,6 +10,7 @@ namespace Dmr.Api.Services.MessageForwarder
     /// </summary>
     public class MessageForwarderService : AsyncProcessorService<Message, MessageForwarderSettings>
     {
+        private const string ClassifierId = "Classifier";
         private readonly ICentOps centOps;
 
         public MessageForwarderService(
@@ -24,27 +25,67 @@ namespace Dmr.Api.Services.MessageForwarder
 
         public override async Task ProcessRequestAsync(Message payload)
         {
-            try
+            if (payload == null || payload.Headers == null || payload.Messages == null)
             {
-                if (payload == null || payload.Headers == null || payload.Messages == null)
-                {
-                    throw new ArgumentNullException(nameof(payload));
-                }
-                if (payload.Headers.XSentTo == "unclassified")
+                throw new ArgumentNullException(nameof(payload));
+            }
+
+            if (string.IsNullOrEmpty(payload.Headers.XSendTo) || payload.Headers.XSendTo == ClassifierId)
+            {
+                try
                 {
                     //pass in the callback uri in Messages                    
                     var response = await HttpClient.PostAsJsonAsync(Config.ClassifierUri, payload).ConfigureAwait(true);
                     _ = response.EnsureSuccessStatusCode();
                 }
-                else
+                catch (HttpRequestException httpReqException)
                 {
-                    //Need to send it to Centops, but for now check in the config to find out the Bot URI
+                    Logger.ClassifierCallError(httpReqException);
+
+                    // Respond to the client chatbot that an error has been encountered.
+                    await RespondWithError(payload).ConfigureAwait(true);
                 }
+
+                return;
             }
-            catch (HttpRequestException exception)
+
+
+            var participantEndpoint = string.Empty;
+
+            try
             {
-                Logger.ClassifierCallError(exception);
+                participantEndpoint = await centOps.TryGetEndpoint(payload.Headers.XSendTo).ConfigureAwait(true);
+                if (string.IsNullOrEmpty(participantEndpoint))
+                {
+                    throw new KeyNotFoundException($"Participant not found with id '{payload.Headers.XSendTo}'");
+                }
+
+                var response = await HttpClient.PostAsJsonAsync(participantEndpoint, payload).ConfigureAwait(true);
+                _ = response.EnsureSuccessStatusCode();
             }
+            catch (KeyNotFoundException knfException)
+            {
+                Logger.CentOpsCallError(payload.Headers.XSendTo, knfException);
+
+                // Respond to the client chatbot that an error has been encountered.
+                await RespondWithError(payload).ConfigureAwait(true);
+            }
+            catch (HttpRequestException httpReqException)
+            {
+                Logger.ChatbotCallError(payload.Headers.XSendTo, participantEndpoint, httpReqException);
+            }
+        }
+
+        private static Task RespondWithError(Message _)
+        {
+            // On Error
+            // contentype header for errors?  application/x.dmr.error+json;version=1
+            // blank the payload
+            // 
+
+            // 502 - response from upstream.
+            return Task.CompletedTask;
         }
     }
 }
+

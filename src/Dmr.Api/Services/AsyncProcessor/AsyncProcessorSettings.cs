@@ -3,7 +3,7 @@ namespace Dmr.Api.Services.AsyncProcessor
     public class AsyncProcessorSettings
     {
         private const string DefaultHttpClientName = "Client";
-        private const int DefaultHttpRequestTimeoutMs = 30_000;
+        private const int DefaultHttpRequestTimeoutMs = 10_000;
         private const int DefaultRequestProcessIntervalMs = 5_000;
 
         /// <summary>

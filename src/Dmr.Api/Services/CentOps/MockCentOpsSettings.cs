@@ -2,18 +2,14 @@
 {
     public class ChatBot
     {
-        public ChatBot(string id, string endpoint)
-        {
-            Id = id;
-            Endpoint = endpoint;
-        }
-
-        public string Id { get; }
-        public string Endpoint { get; }
+        public string? Id { get; set; }
+        public string? Endpoint { get; set; }
     }
 
     public class MockCentOpsSettings
     {
-        public IReadOnlyCollection<ChatBot> ChatBots { get; set; } = Array.Empty<ChatBot>();
+#pragma warning disable CA1819 // Properties should not return arrays
+        public ChatBot[] ChatBots { get; set; } = Array.Empty<ChatBot>();
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 }

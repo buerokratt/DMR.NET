@@ -23,10 +23,10 @@ namespace Dmr.Api
             var dmrSettings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
             builder.Services.AddMessageForwarder(dmrSettings);
 
-            // Add MockCentOps Configuration.
+            // Add MockCentOps.
             var mockCentOpsSettings = builder.Configuration.GetSection("MockCentOps").Get<MockCentOpsSettings>();
-            builder.Services.TryAddSingleton(mockCentOpsSettings);
-            _ = builder.Services.AddTransient<ICentOps, MockedCentOps>();
+            builder.Services.TryAddSingleton(mockCentOpsSettings ?? new MockCentOpsSettings());
+            _ = builder.Services.AddTransient<ICentOps, MockCentOps>();
 
             var app = builder.Build();
 
