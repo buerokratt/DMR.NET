@@ -2,8 +2,6 @@ using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
-using System.Net.Http.Headers;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 
 namespace Dmr.Api.Services.MessageForwarder
@@ -70,7 +68,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 }
 
                 using var content = GetDefaultRequestContent(payload, headers);
-                var response = await HttpClient.PostAsync(Config.ClassifierUri, content).ConfigureAwait(true);
+                var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(true);
                 _ = response.EnsureSuccessStatusCode();
             }
             catch (KeyNotFoundException knfException)

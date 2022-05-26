@@ -22,5 +22,8 @@ namespace Dmr.Api.Models
 
         [FromHeader(Name = Constants.XContentTypeHeaderName)]
         public string? XContentType { get; set; }
+
+        [FromHeader(Name = "Content-Type")]
+        public string? ContentType { get; set; }
     }
 }

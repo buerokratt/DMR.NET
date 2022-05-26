@@ -25,6 +25,12 @@
             classifierCallFailed(logger, ex);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="chatbotId"></param>
+        /// <param name="ex"></param>
         public static void CentOpsCallError(this ILogger logger, string chatbotId, Exception ex)
         {
             centOpsCallFailed(logger, chatbotId, ex);

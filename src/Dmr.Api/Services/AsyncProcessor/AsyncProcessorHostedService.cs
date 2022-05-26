@@ -65,11 +65,11 @@ namespace Dmr.Api.Services.AsyncProcessor
 
             try
             {
-                self.logger.AsyncProcessorStarted();
+                self.logger.AsyncProcessorStateChange("started");
 
                 await self.service.ProcessRequestsAsync().ConfigureAwait(true);
 
-                self.logger.AsyncProcessorCompleted();
+                self.logger.AsyncProcessorStateChange("completed");
             }
             catch (Exception ex)
             {
