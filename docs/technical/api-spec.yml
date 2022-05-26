@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
   title: Distributed Message Room API
-  version: '1.0'
+  version: 0.1.0
   license:
-    name: MIT-0
+    name: MIT
     url: 'https://opensource.org/licenses/MIT'
   description: A well-orchestrated high-performance proxy pass.
 servers:
@@ -17,22 +17,20 @@ paths:
         '202':
           description: Accepted
       parameters:
-        - name: X-Sent-From
-          in: header
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: b4ac37cf-1ae9-429e-9d05-22d7db901ef3
-          description: Uuid of the participant that sent the message.
         - name: X-Send-To
           in: header
           required: true
           schema:
             type: string
-            format: uuid
-            example: fe8afddd-57c6-448b-8b1b-e505b034d32c
-          description: Participant uuid to send the message to.
+            example: Classifier
+          description: Participant name to send the message to.
+        - name: X-Sent-By
+          in: header
+          required: true
+          schema:
+            type: string
+            example: NLib
+          description: Name of the participant that sent the message.
         - name: X-Message-Id
           in: header
           required: true
@@ -48,6 +46,13 @@ paths:
             format: uuid
             example: 545226ad-0b8d-4ccb-b83f-6b3ad8d44ec8
           description: Reference to the original X-Message-Id we are replying to.
+        - name: Content-Type
+          in: header
+          required: true
+          schema:
+            type: string
+            example: application/x.classifier.classification+json;version=1
+          description: Content type of the payload in its in unencrypted form.
       requestBody:
         content:
           text/plain:
@@ -68,18 +73,16 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
-        example: fe8afddd-57c6-448b-8b1b-e505b034d32c
-      description: Participant uuid to send the message to.
-    X-Sent-From:
-      name: X-Sent-From
+        example: Classifier
+      description: Participant name to send the message to.
+    X-Sent-By:
+      name: X-Sent-By
       in: header
       required: true
       schema:
         type: string
-        format: uuid
-        example: b4ac37cf-1ae9-429e-9d05-22d7db901ef3
-      description: Uuid of the participant that sent the message.
+        example: NLib
+      description: Name of the participant that sent the message.
     X-Message-Id:
       name: X-Message-Id
       in: header
@@ -97,6 +100,14 @@ components:
         format: uuid
         example: 545226ad-0b8d-4ccb-b83f-6b3ad8d44ec8
       description: Reference to the original X-Message-Id we are replying to.
+    Content-Type:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        example: application/x.classifier.classification+json;version=1
+      description: Content type of the payload in its in unencrypted form.
   requestBodies:
     Message:
       content:
