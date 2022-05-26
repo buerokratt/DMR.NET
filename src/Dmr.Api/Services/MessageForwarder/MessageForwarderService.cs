@@ -25,7 +25,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
         public override async Task ProcessRequestAsync(Message payload)
         {
-            if (payload == null || payload.Headers == null || payload.Messages == null)
+            if (payload == null || payload.Headers == null || payload.Payload == null)
             {
                 throw new ArgumentNullException(nameof(payload));
             }

@@ -4,6 +4,6 @@ namespace Dmr.Api.Services.Classifier
 {
     public interface IClassifier
     {
-        Task Classify(MessagesInput messages);
+        Task Classify(Message messages);
     }
 }
