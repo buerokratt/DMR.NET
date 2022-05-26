@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RichardSzalay.MockHttp;
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -93,6 +94,10 @@ namespace Dmr.UnitTests
             var mockCentOps = new Mock<ICentOps>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
+
+            _ = httpMessageHandler.Expect("http://classifier")
+                .Respond(HttpStatusCode.Accepted);
+
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
 
             var sut = new MessageForwarderService(
@@ -101,7 +106,7 @@ namespace Dmr.UnitTests
                 mockCentOps.Object,
                 logger.Object);
 
-            // Act && Assert
+            // Act
             await sut.ProcessRequestAsync(
                     new Message
                     {
@@ -112,6 +117,9 @@ namespace Dmr.UnitTests
                             XSendTo = Constants.ClassifierId
                         }
                     }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
         }
 
         private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
