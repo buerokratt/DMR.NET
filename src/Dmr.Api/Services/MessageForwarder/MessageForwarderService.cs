@@ -2,7 +2,6 @@ using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
-using System.Text;
 
 namespace Dmr.Api.Services.MessageForwarder
 {
@@ -44,7 +43,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
                 await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
             }
-            catch (MessageSenderException)
+            catch (MessageForwarderException)
             {
                 await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
             }
@@ -74,12 +73,12 @@ namespace Dmr.Api.Services.MessageForwarder
             catch (KeyNotFoundException knfException)
             {
                 Logger.CentOpsCallError(headers.XSendTo, knfException);
-                throw new MessageSenderException("Couldn't find participant", knfException);
+                throw new MessageForwarderException("Couldn't find participant", knfException);
             }
             catch (HttpRequestException httpReqException)
             {
                 Logger.ChatbotCallError(headers.XSendTo, participantEndpoint, httpReqException);
-                throw new MessageSenderException("Calling participant failed.", httpReqException);
+                throw new MessageForwarderException("Calling participant failed.", httpReqException);
             }
         }
 
@@ -93,7 +92,7 @@ namespace Dmr.Api.Services.MessageForwarder
             }
             catch (HttpRequestException httpReqException)
             {
-                throw new MessageSenderException("Calling classifier failed.", httpReqException);
+                throw new MessageForwarderException("Calling classifier failed.", httpReqException);
             }
         }
 
@@ -141,7 +140,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
         private static StringContent GetDefaultRequestContent(string payload, HeadersInput headers)
         {
-            var content = new StringContent(payload, Encoding.UTF8);
+            var content = new StringContent(payload, System.Text.Encoding.UTF8);
             content.Headers.Add(Constants.XSendToHeaderName, headers.XSendTo);
             content.Headers.Add(Constants.XSentByHeaderName, headers.XSentBy);
             content.Headers.Add(Constants.XMessageIdHeaderName, headers.XMessageId);
