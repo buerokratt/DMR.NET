@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Dmr.Api.Models
 {
-    // No logic so no unit tests are required
-
     public class HeadersInput
     {
         [FromHeader(Name = "X-Sent-By")]
