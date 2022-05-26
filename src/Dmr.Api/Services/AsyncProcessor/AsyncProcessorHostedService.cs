@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Dmr.Api.Services.AsyncProcessor.Extensions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Dmr.Api.Services.AsyncProcessor
@@ -53,32 +53,27 @@ namespace Dmr.Api.Services.AsyncProcessor
         {
             if (state == null)
             {
-                Trace.WriteLine($"Unable to start processor - no AsyncProcessorHostedService<TPayload> passed.");
-                return;
+                throw new ArgumentNullException(nameof(state));
             }
 
             if (state is not AsyncProcessorHostedService<TPayload> self)
             {
-                Trace.WriteLine($"Unable to start processor - state doesn't derive from AsyncProcessorHostedService<TPayload>");
-                return;
+                throw new ArgumentException($"Unable to start processor - state doesn't derive from AsyncProcessorHostedService<TPayload>");
             }
 
             self.StopTimer();
 
             try
             {
-                // Not sure how to resolve rule CA1848 so removing logging for now
-                //self.logger.LogInformation("Starting processing DMR requests");
+                self.logger.AsyncProcessorStarted();
 
                 await self.service.ProcessRequestsAsync().ConfigureAwait(true);
 
-                // Not sure how to resolve rule CA1848 so removing logging for now
-                //self.logger.LogInformation("Completed processing DMR requests");
+                self.logger.AsyncProcessorCompleted();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Not sure how to resolve rule CA1848 so removing logging for now
-                //self.logger.LogError(ex, $"Unexpected error in {nameof(DmrHostedService)}.");
+                self.logger.AsyncProcessorFailed(ex);
                 throw;
             }
             finally

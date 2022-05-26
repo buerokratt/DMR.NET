@@ -82,7 +82,6 @@ namespace Dmr.Api.Services.MessageForwarder
             // blank the payload
             // 
 
-            // 502 - response from upstream.
             return Task.CompletedTask;
         }
     }
