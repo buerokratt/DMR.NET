@@ -6,18 +6,21 @@ namespace Dmr.Api.Models
     public class HeadersInput
     {
         [Required]
-        [FromHeader(Name = "X-Sent-By")]
+        [FromHeader(Name = Constants.XSentByHeaderName)]
         public string? XSentBy { get; set; }
 
         [Required]
-        [FromHeader(Name = "X-Send-To")]
+        [FromHeader(Name = Constants.XSendToHeaderName)]
         public string? XSendTo { get; set; }
 
         [Required]
-        [FromHeader(Name = "X-Message-Id")]
+        [FromHeader(Name = Constants.XMessageIdHeaderName)]
         public string? XMessageId { get; set; }
 
-        [FromHeader(Name = "X-Message-Id-Ref")]
+        [FromHeader(Name = Constants.XMessageIdRefHeaderName)]
         public string? XMessageIdRef { get; set; }
+
+        [FromHeader(Name = Constants.XContentTypeHeaderName)]
+        public string? XContentType { get; set; }
     }
 }

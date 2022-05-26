@@ -2,6 +2,9 @@ using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
+using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
+using System.Text;
 
 namespace Dmr.Api.Services.MessageForwarder
 {
@@ -10,7 +13,6 @@ namespace Dmr.Api.Services.MessageForwarder
     /// </summary>
     public class MessageForwarderService : AsyncProcessorService<Message, MessageForwarderSettings>
     {
-        private const string ClassifierId = "Classifier";
         private readonly ICentOps centOps;
 
         public MessageForwarderService(
@@ -30,59 +32,125 @@ namespace Dmr.Api.Services.MessageForwarder
                 throw new ArgumentNullException(nameof(payload));
             }
 
-            if (string.IsNullOrEmpty(payload.Headers.XSendTo) || payload.Headers.XSendTo == ClassifierId)
+            if (string.IsNullOrEmpty(payload.Headers.XSentBy) || string.IsNullOrEmpty(payload.Headers.XSendTo))
             {
-                try
-                {
-                    //pass in the callback uri in Messages                    
-                    var response = await HttpClient.PostAsJsonAsync(Config.ClassifierUri, payload).ConfigureAwait(true);
-                    _ = response.EnsureSuccessStatusCode();
-                }
-                catch (HttpRequestException httpReqException)
-                {
-                    Logger.ClassifierCallError(httpReqException);
-
-                    // Respond to the client chatbot that an error has been encountered.
-                    await RespondWithError(payload).ConfigureAwait(true);
-                }
-
-                return;
+                throw new ArgumentException($"Required headers {Constants.XSentByHeaderName} and {Constants.XSendToHeaderName} are missing.");
             }
-
-            var participantEndpoint = string.Empty;
 
             try
             {
-                participantEndpoint = await centOps.TryGetEndpoint(payload.Headers.XSendTo).ConfigureAwait(true);
-                if (string.IsNullOrEmpty(participantEndpoint))
+                if (payload.Headers.XSendTo != Constants.ClassifierId)
                 {
-                    throw new KeyNotFoundException($"Participant not found with id '{payload.Headers.XSendTo}'");
+                    await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(true);
                 }
 
-                var response = await HttpClient.PostAsJsonAsync(participantEndpoint, payload).ConfigureAwait(true);
+                await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
+            }
+            catch (MessageSenderException)
+            {
+                await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
+            }
+        }
+
+        private async Task ResolveRecipientAndForward(string payload, HeadersInput headers)
+        {
+            if (headers == null || string.IsNullOrEmpty(headers.XSendTo))
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
+            Uri? participantEndpoint = null;
+
+            try
+            {
+                participantEndpoint = await centOps.TryGetEndpoint(headers.XSendTo).ConfigureAwait(true);
+                if (participantEndpoint == null)
+                {
+                    throw new KeyNotFoundException($"Participant not found with id '{headers.XSendTo}'");
+                }
+
+                using var content = GetDefaultRequestContent(payload, headers);
+                var response = await HttpClient.PostAsync(Config.ClassifierUri, content).ConfigureAwait(true);
                 _ = response.EnsureSuccessStatusCode();
             }
             catch (KeyNotFoundException knfException)
             {
-                Logger.CentOpsCallError(payload.Headers.XSendTo, knfException);
-
-                // Respond to the client chatbot that an error has been encountered.
-                await RespondWithError(payload).ConfigureAwait(true);
+                Logger.CentOpsCallError(headers.XSendTo, knfException);
+                throw new MessageSenderException("Couldn't find participant", knfException);
             }
             catch (HttpRequestException httpReqException)
             {
-                Logger.ChatbotCallError(payload.Headers.XSendTo, participantEndpoint, httpReqException);
+                Logger.ChatbotCallError(headers.XSendTo, participantEndpoint, httpReqException);
+                throw new MessageSenderException("Calling participant failed.", httpReqException);
             }
         }
 
-        private static Task RespondWithError(Message _)
+        private async Task SendMessageForClassification(string payload, HeadersInput headers)
         {
-            // On Error
-            // contentype header for errors?  application/x.dmr.error+json;version=1
-            // blank the payload
-            // 
+            try
+            {
+                using var content = GetDefaultRequestContent(payload, headers);
+                var response = await HttpClient.PostAsync(Config.ClassifierUri, content).ConfigureAwait(true);
+                _ = response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException httpReqException)
+            {
+                throw new MessageSenderException("Calling classifier failed.", httpReqException);
+            }
+        }
 
-            return Task.CompletedTask;
+        private async Task NotifySenderOfError(HeadersInput headers)
+        {
+            if (headers == null || string.IsNullOrEmpty(headers.XSentBy))
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
+            Uri? participantEndpoint = null;
+
+            try
+            {
+                participantEndpoint = await centOps.TryGetEndpoint(headers.XSentBy).ConfigureAwait(true);
+                if (participantEndpoint == null)
+                {
+                    throw new KeyNotFoundException($"Participant not found with id '{headers.XSentBy}'");
+                }
+
+                using var content = GetDefaultRequestContent(string.Empty, headers);
+
+                // This error originates from the DMR and has a special X-Content-Type.
+                _ = content.Headers.Remove(Constants.XSendToHeaderName);
+                content.Headers.Add(Constants.XSendToHeaderName, headers.XSentBy);
+                _ = content.Headers.Remove(Constants.XSentByHeaderName);
+                content.Headers.Add(Constants.XSentByHeaderName, Constants.DmrId);
+                _ = content.Headers.Remove(Constants.XContentTypeHeaderName);
+                content.Headers.Add(Constants.XContentTypeHeaderName, Constants.ErrorContentType);
+                _ = content.Headers.Remove(Constants.XMessageIdRefHeaderName);
+                content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageId);
+
+                var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(true);
+                _ = response.EnsureSuccessStatusCode();
+            }
+            catch (KeyNotFoundException knfException)
+            {
+                Logger.CentOpsCallError(headers.XSentBy, knfException);
+            }
+            catch (HttpRequestException httpReqException)
+            {
+                Logger.ChatbotCallError(headers.XSentBy, participantEndpoint, httpReqException);
+            }
+        }
+
+        private static StringContent GetDefaultRequestContent(string payload, HeadersInput headers)
+        {
+            var content = new StringContent(payload, Encoding.UTF8);
+            content.Headers.Add(Constants.XSendToHeaderName, headers.XSendTo);
+            content.Headers.Add(Constants.XSentByHeaderName, headers.XSentBy);
+            content.Headers.Add(Constants.XMessageIdHeaderName, headers.XMessageId);
+            content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageIdRef);
+            content.Headers.Add(Constants.XContentTypeHeaderName, headers.XContentType);
+
+            return content;
         }
     }
 }

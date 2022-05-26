@@ -30,9 +30,9 @@
             centOpsCallFailed(logger, chatbotId, ex);
         }
 
-        public static void ChatbotCallError(this ILogger logger, string chatbotId, string chatbotEndpoint, Exception ex)
+        public static void ChatbotCallError(this ILogger logger, string chatbotId, Uri? chatbotEndpoint, Exception ex)
         {
-            chatbotCallFailed(logger, chatbotId, chatbotEndpoint, ex);
+            chatbotCallFailed(logger, chatbotId, chatbotEndpoint?.ToString() ?? string.Empty, ex);
         }
     }
 }
