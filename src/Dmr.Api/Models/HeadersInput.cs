@@ -21,7 +21,7 @@ namespace Dmr.Api.Models
         public string? XMessageIdRef { get; set; }
 
         [FromHeader(Name = Constants.XModelTypeHeaderName)]
-        public string? XContentType { get; set; }
+        public string? XModelType { get; set; }
 
         [FromHeader(Name = Constants.ContentTypeHeaderName)]
         public string? ContentType { get; set; }

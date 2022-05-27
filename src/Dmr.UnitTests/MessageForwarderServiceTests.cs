@@ -17,6 +17,40 @@ namespace Dmr.UnitTests
     /// </summary>
     public class MessageForwarderServiceTests
     {
+        private const string DefaultModelType = "application/vnd.buerokratt;version=1";
+
+        [Fact]
+        public void MessageForwarderThrowsForNullClientFactory()
+        {
+            // Arrange
+            var mockCentOps = new Mock<ICentOps>();
+            Mock<ILogger<MessageForwarderService>> logger = new();
+
+            // Act && Assert
+            _ = Assert.Throws<ArgumentNullException>(
+                () => new MessageForwarderService(null,
+                 new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                mockCentOps.Object,
+                logger.Object));
+        }
+
+        [Fact]
+        public void MessageForwarderThrowsForNullConfiguration()
+        {
+            // Arrange
+            var mockCentOps = new Mock<ICentOps>();
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            // Act && Assert
+            _ = Assert.Throws<ArgumentNullException>(
+                () => new MessageForwarderService(null,
+               null,
+                mockCentOps.Object,
+                logger.Object));
+        }
+
         [Fact]
         public async Task MessageForwarderProcessesEnqueuedMessages()
         {
@@ -149,6 +183,62 @@ namespace Dmr.UnitTests
         }
 
         /// <summary>
+        /// Verifies missing headers result in an <see cref="ArgumentException"/> being thrown.
+        /// </summary>
+        [Fact]
+        public async Task ProcessRequestAsyncThrowsForMissingXSentBy()
+        {
+            // Arrange
+            var mockCentOps = new Mock<ICentOps>();
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings(),
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act && Assert
+            _ = await Assert.ThrowsAsync<ArgumentException>(() =>
+                sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput() { XSendTo = "Police" }
+                    })).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// Verifies missing headers result in an <see cref="ArgumentException"/> being thrown.
+        /// </summary>
+        [Fact]
+        public async Task ProcessRequestAsyncThrowsForMissingXSendTo()
+        {
+            // Arrange
+            var mockCentOps = new Mock<ICentOps>();
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings(),
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act && Assert
+            _ = await Assert.ThrowsAsync<ArgumentException>(() =>
+                sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput() { XSendTo = "Police" }
+                    })).ConfigureAwait(true);
+        }
+
+        /// <summary>
         /// Verfies is a message is flagged for classification - the classifier is called.
         /// </summary>
         [Fact]
@@ -159,7 +249,14 @@ namespace Dmr.UnitTests
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
 
-            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, "http://classifier")
+                .WithHeaders(Constants.XSentByHeaderName, "Police")
+                .WithHeaders(Constants.XSendToHeaderName, Constants.ClassifierId)
+                .WithHeaders(Constants.XModelTypeHeaderName, DefaultModelType)
+                .WithHeaders(Constants.ContentTypeHeaderName, "text/plain")
+                .WithHeaders(Constants.XMessageIdHeaderName, "2222")
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "1111")
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -179,11 +276,15 @@ namespace Dmr.UnitTests
                         {
                             XSendTo = Constants.ClassifierId,
                             XSentBy = "Police",
+                            XModelType = DefaultModelType,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111"
                         }
                     }).ConfigureAwait(true);
 
             // Assert
             httpMessageHandler.VerifyNoOutstandingExpectation();
+            mockCentOps.Verify(c => c.TryGetEndpoint(It.IsAny<string>()), Times.Never);
         }
 
         /// <summary>
@@ -202,7 +303,14 @@ namespace Dmr.UnitTests
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
 
-            _ = httpMessageHandler.Expect(HttpMethod.Post, chatbotEndpoint.ToString())
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, chatbotEndpoint.ToString())
+                .WithHeaders(Constants.XSentByHeaderName, "Police")
+                .WithHeaders(Constants.XSendToHeaderName, chatbotId)
+                .WithHeaders(Constants.XModelTypeHeaderName, DefaultModelType)
+                .WithHeaders(Constants.ContentTypeHeaderName, "text/plain")
+                .WithHeaders(Constants.XMessageIdHeaderName, "2222")
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "1111")
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -222,6 +330,9 @@ namespace Dmr.UnitTests
                         {
                             XSendTo = chatbotId,
                             XSentBy = "Police",
+                            XModelType = DefaultModelType,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111"
                         }
                     }).ConfigureAwait(true);
 
@@ -253,7 +364,13 @@ namespace Dmr.UnitTests
                 .Respond(HttpStatusCode.InternalServerError);
 
             // Source chatbot receives error callback.
-            _ = httpMessageHandler.Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
+                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithContent(string.Empty)
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -273,6 +390,8 @@ namespace Dmr.UnitTests
                         {
                             XSendTo = destinationChatbotId,
                             XSentBy = sourceChatbotId,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111",
                         }
                     }).ConfigureAwait(true);
 
@@ -282,6 +401,7 @@ namespace Dmr.UnitTests
 
         /// <summary>
         /// Notifies the caller of an error has occurred if classification fails.
+        /// Headers should be set accordingly.
         /// </summary>
         [Fact]
         public async Task ProcessRequestNotifiesCallerOfClassificationError()
@@ -299,10 +419,18 @@ namespace Dmr.UnitTests
             _ = mockCentOps.Setup(m => m.TryGetEndpoint(destinationChatbotId)).Returns(Task.FromResult<Uri>(null));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+
             using MockHttpMessageHandler httpMessageHandler = new();
 
             // Source chatbot receives error callback.
-            _ = httpMessageHandler.Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
+                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithContent(string.Empty)
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -322,6 +450,8 @@ namespace Dmr.UnitTests
                         {
                             XSendTo = destinationChatbotId,
                             XSentBy = sourceChatbotId,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111",
                         }
                     }).ConfigureAwait(true);
 

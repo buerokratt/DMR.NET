@@ -20,7 +20,10 @@
 
             // Build a hash table of endpoints - throwing away endpoints which aren't valid uris.
             chatbots = settings.ChatBots
-                .Where(cb => Uri.IsWellFormedUriString(cb.Endpoint, UriKind.Absolute))
+                .Where(
+                    cb => string.IsNullOrEmpty(cb.Endpoint) == false &&
+                          string.IsNullOrEmpty(cb.Id) == false &&
+                          Uri.IsWellFormedUriString(cb.Endpoint, UriKind.Absolute))
                 .ToDictionary(cb => cb.Id ?? string.Empty, cb => new Uri(cb.Endpoint ?? string.Empty), StringComparer.OrdinalIgnoreCase);
         }
 

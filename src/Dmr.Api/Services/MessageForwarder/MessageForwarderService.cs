@@ -38,7 +38,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
             if (string.IsNullOrEmpty(payload.Headers.XSentBy) || string.IsNullOrEmpty(payload.Headers.XSendTo))
             {
-                throw new ArgumentException($"Required headers {Constants.XSentByHeaderName} and {Constants.XSendToHeaderName} are missing.");
+                throw new ArgumentException($"Required headers {Constants.XSentByHeaderName} or {Constants.XSendToHeaderName} are missing.");
             }
 
             try
@@ -156,7 +156,7 @@ namespace Dmr.Api.Services.MessageForwarder
             content.Headers.Add(Constants.XSentByHeaderName, headers.XSentBy);
             content.Headers.Add(Constants.XMessageIdHeaderName, headers.XMessageId);
             content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageIdRef);
-            content.Headers.Add(Constants.XModelTypeHeaderName, headers.XContentType);
+            content.Headers.Add(Constants.XModelTypeHeaderName, headers.XModelType);
 
             // Unless specified by the caller - the use the text/plain mime type.
             _ = content.Headers.Remove(Constants.ContentTypeHeaderName);

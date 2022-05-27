@@ -90,5 +90,51 @@ namespace Dmr.UnitTests
             // Assert
             Assert.Null(uri);
         }
+
+        [Fact]
+        public async Task MockCentOpsIgnoresNullChatBotId()
+        {
+            // Arrange
+            var mockLogger = new Mock<ILogger<MockCentOps>>();
+            var settings = new MockCentOpsSettings()
+            {
+                ChatBots = new[]
+                {
+                    new ChatBot { Id = "bot1", Endpoint = "https://bot1/" },
+                    new ChatBot { Id = null, Endpoint = "https://bot2/" },
+                }
+            };
+
+            var mockCentOps = new MockCentOps(settings, mockLogger.Object);
+
+            // Act
+            var uri = await mockCentOps.TryGetEndpoint("bot2").ConfigureAwait(true);
+
+            // Assert
+            Assert.Null(uri);
+        }
+
+        [Fact]
+        public async Task MockCentOpsIgnoresNullChatBotEndpoint()
+        {
+            // Arrange
+            var mockLogger = new Mock<ILogger<MockCentOps>>();
+            var settings = new MockCentOpsSettings()
+            {
+                ChatBots = new[]
+                {
+                    new ChatBot { Id = "bot1", Endpoint = "https://bot1/" },
+                    new ChatBot { Id = "bot2", Endpoint = null },
+                }
+            };
+
+            var mockCentOps = new MockCentOps(settings, mockLogger.Object);
+
+            // Act
+            var uri = await mockCentOps.TryGetEndpoint("bot2").ConfigureAwait(true);
+
+            // Assert
+            Assert.Null(uri);
+        }
     }
 }

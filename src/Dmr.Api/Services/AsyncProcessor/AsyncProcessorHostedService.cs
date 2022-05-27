@@ -11,7 +11,8 @@ namespace Dmr.Api.Services.AsyncProcessor
         private readonly AsyncProcessorSettings config;
         private readonly ILogger<AsyncProcessorHostedService<TPayload>> logger;
         private readonly Timer timer;
-        private bool running;
+
+        public bool IsRunning { get; private set; }
 
         public AsyncProcessorHostedService(
             IAsyncProcessorService<TPayload> service,
@@ -26,7 +27,7 @@ namespace Dmr.Api.Services.AsyncProcessor
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            running = true;
+            IsRunning = true;
             StartTimer();
 
             return Task.CompletedTask;
@@ -34,7 +35,7 @@ namespace Dmr.Api.Services.AsyncProcessor
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            running = false;
+            IsRunning = false;
             StopTimer();
 
             return Task.CompletedTask;
@@ -79,7 +80,7 @@ namespace Dmr.Api.Services.AsyncProcessor
             }
             finally
             {
-                if (self.running)
+                if (self.IsRunning)
                 {
                     self.StartTimer();
                 }
