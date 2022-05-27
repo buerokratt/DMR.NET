@@ -1,5 +1,9 @@
 ﻿namespace Dmr.Api.Services.CentOps
 {
+    /// <summary>
+    /// A simple mock CentOps implementation which is driven by configuration rather than a genuine CentOps service.
+    /// This implementation will be replaced when CentOps is implemented.
+    /// </summary>
     public class MockCentOps : ICentOps
     {
         private readonly ILogger<MockCentOps> logger;
@@ -13,8 +17,10 @@
             }
 
             this.logger = logger;
+
+            // Build a hash table of endpoints - throwing away endpoints which aren't valid uris.
             chatbots = settings.ChatBots
-                .Where(cb => Uri.IsWellFormedUriString(cb.Endpoint, UriKind.RelativeOrAbsolute))
+                .Where(cb => Uri.IsWellFormedUriString(cb.Endpoint, UriKind.Absolute))
                 .ToDictionary(cb => cb.Id ?? string.Empty, cb => new Uri(cb.Endpoint ?? string.Empty), StringComparer.OrdinalIgnoreCase);
         }
 

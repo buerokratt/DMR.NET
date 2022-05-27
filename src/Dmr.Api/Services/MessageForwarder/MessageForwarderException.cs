@@ -1,5 +1,8 @@
 ﻿namespace Dmr.Api.Services.MessageForwarder
 {
+    /// <summary>
+    /// Exception of <see cref="MessageForwarderService"/> operations.
+    /// </summary>
     public class MessageForwarderException : Exception
     {
         public MessageForwarderException() { }

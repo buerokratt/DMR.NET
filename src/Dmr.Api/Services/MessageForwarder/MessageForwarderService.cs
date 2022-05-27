@@ -22,6 +22,13 @@ namespace Dmr.Api.Services.MessageForwarder
             this.centOps = centOps;
         }
 
+        /// <summary>
+        /// Processing here will perform the core DMR routing logic.
+        /// </summary>
+        /// <param name="payload">A message payload to process.</param>
+        /// <returns>A Task wrapping the execution of this method.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public override async Task ProcessRequestAsync(Message payload)
         {
             if (payload == null || payload.Headers == null || payload.Payload == null)
@@ -36,16 +43,19 @@ namespace Dmr.Api.Services.MessageForwarder
 
             try
             {
-                if (payload.Headers.XSendTo != Constants.ClassifierId)
+                // If classification is specified - forward to the classifier.
+                if (payload.Headers.XSendTo == Constants.ClassifierId)
                 {
-                    await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(true);
+                    await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
                     return;
                 }
 
-                await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
+                // If a recipient is specified - resolve the recipient's endpoint and forward the message.
+                await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(true);
             }
             catch (MessageForwarderException)
             {
+                // If something went wrong - notify the sender.
                 await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
             }
         }
@@ -116,7 +126,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
                 using var content = GetDefaultRequestContent(string.Empty, headers);
 
-                // This error originates from the DMR and has a special X-Content-Type.
+                // This error originates from the DMR and has a special X-Model-Type.
                 _ = content.Headers.Remove(Constants.XSendToHeaderName);
                 content.Headers.Add(Constants.XSendToHeaderName, headers.XSentBy);
                 _ = content.Headers.Remove(Constants.XSentByHeaderName);
@@ -147,6 +157,8 @@ namespace Dmr.Api.Services.MessageForwarder
             content.Headers.Add(Constants.XMessageIdHeaderName, headers.XMessageId);
             content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageIdRef);
             content.Headers.Add(Constants.XModelTypeHeaderName, headers.XContentType);
+
+            // Unless specified by the caller - the use the text/plain mime type.
             _ = content.Headers.Remove(Constants.ContentTypeHeaderName);
             content.Headers.Add(Constants.ContentTypeHeaderName, headers.ContentType ?? "text/plain");
 

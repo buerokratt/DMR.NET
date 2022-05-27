@@ -10,10 +10,10 @@ namespace Dmr.Api.Services.MessageForwarder.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Helper extension to easily install the DMR Service
+        /// Helper extension configure IOC container with <see cref="MessageForwarderService"/> Service and associated services.
         /// </summary>
-        /// <param name="services">The services collection that <see cref="DmrService"/> and related services will be added to.</param>
-        /// <param name="settings">A settings object for the <see cref="DmrService"/></param>
+        /// <param name="services">The services collection that <see cref="MessageForwarderService"/> and related services will be added to.</param>
+        /// <param name="settings">A settings object for the <see cref="MessageForwarderService"/></param>
         public static void AddMessageForwarder(this IServiceCollection services, MessageForwarderSettings settings)
         {
             if (settings == null)

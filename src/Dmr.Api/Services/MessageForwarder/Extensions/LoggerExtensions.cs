@@ -26,16 +26,23 @@
         }
 
         /// <summary>
-        /// 
+        /// Creates a log message/event when CentOps calls fail.
         /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="chatbotId"></param>
-        /// <param name="ex"></param>
+        /// <param name="logger">extended ILogger</param>
+        /// <param name="chatbotId">Id of the chatbot being requested.</param>
+        /// <param name="ex">Exception which occurred, if any.</param>
         public static void CentOpsCallError(this ILogger logger, string chatbotId, Exception ex)
         {
             centOpsCallFailed(logger, chatbotId, ex);
         }
 
+        /// <summary>
+        /// Creates a log message/event when a chatbot call fails.
+        /// </summary>
+        /// <param name="logger">extended ILogger</param>
+        /// <param name="chatbotId">Id of the chatbot being called.</param>
+        /// <param name="chatbotEndpoint">Url of the chatbot being called.</param>
+        /// <param name="ex">Exception which occurred, if any.</param>
         public static void ChatbotCallError(this ILogger logger, string chatbotId, Uri? chatbotEndpoint, Exception ex)
         {
             chatbotCallFailed(logger, chatbotId, chatbotEndpoint?.ToString() ?? string.Empty, ex);

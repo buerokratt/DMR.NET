@@ -12,8 +12,14 @@ using Xunit;
 
 namespace Dmr.UnitTests
 {
+    /// <summary>
+    /// A collection of tests for the core DMR routing logic.
+    /// </summary>
     public class MessageForwarderServiceTests
     {
+        /// <summary>
+        /// Verifies 'null' message payloads result in an <see cref="ArgumentNullException"/> being thrown.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestAsyncThrowsForNullMessage()
         {
@@ -33,6 +39,9 @@ namespace Dmr.UnitTests
             _ = await Assert.ThrowsAsync<ArgumentNullException>(() => sut.ProcessRequestAsync(null)).ConfigureAwait(true);
         }
 
+        /// <summary>
+        /// Verifies 'null' payloads result in an <see cref="ArgumentNullException"/> being thrown.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestAsyncThrowsForNullPayload()
         {
@@ -62,6 +71,10 @@ namespace Dmr.UnitTests
                     })).ConfigureAwait(true);
         }
 
+
+        /// <summary>
+        /// Verifies missing headers result in an <see cref="ArgumentException"/> being thrown.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestAsyncThrowsForMissingHeaders()
         {
@@ -87,6 +100,9 @@ namespace Dmr.UnitTests
                     })).ConfigureAwait(true);
         }
 
+        /// <summary>
+        /// Verfies is a message is flagged for classification - the classifier is called.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestAsyncCallsClassifierIfSpecified()
         {
@@ -122,6 +138,9 @@ namespace Dmr.UnitTests
             httpMessageHandler.VerifyNoOutstandingExpectation();
         }
 
+        /// <summary>
+        /// Verfies is a message is intended for a specific partifipant the endpoint is resolved and the endpoint called.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestResolvesAndForwardsMessage()
         {
@@ -162,7 +181,9 @@ namespace Dmr.UnitTests
             httpMessageHandler.VerifyNoOutstandingExpectation();
         }
 
-
+        /// <summary>
+        /// Notifies the caller of an error has occurred if calling the recipient fails.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestNotifiesCallerOfForwardingError()
         {
@@ -211,7 +232,9 @@ namespace Dmr.UnitTests
             httpMessageHandler.VerifyNoOutstandingExpectation();
         }
 
-
+        /// <summary>
+        /// Notifies the caller of an error has occurred if classification fails.
+        /// </summary>
         [Fact]
         public async Task ProcessRequestNotifiesCallerOfClassificationError()
         {
@@ -257,8 +280,6 @@ namespace Dmr.UnitTests
             // Assert
             httpMessageHandler.VerifyNoOutstandingExpectation();
         }
-
-
 
         private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
         {

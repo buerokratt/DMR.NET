@@ -6,7 +6,6 @@ namespace Dmr.Api.Services.AsyncProcessor
     /// <summary>
     /// A background hosted service that periodically triggers the DMR request processor
     /// </summary>
-    [ExcludeFromCodeCoverage] // Temporarily excluded from code coverage in order to get the CI pipeline merged. This attribute will be removed later.
     public sealed class AsyncProcessorHostedService<TPayload> : IHostedService, IDisposable
     {
         private readonly IAsyncProcessorService<TPayload> service;
