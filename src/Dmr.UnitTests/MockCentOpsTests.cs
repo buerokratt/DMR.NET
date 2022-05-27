@@ -1,6 +1,7 @@
 ﻿using Dmr.Api.Services.CentOps;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -9,6 +10,16 @@ namespace Dmr.UnitTests
 {
     public class MockCentOpsTests
     {
+        [Fact]
+        public void MockCentOpsThrowsForNullConfig()
+        {
+            // Arrange
+            var mockLogger = new Mock<ILogger<MockCentOps>>();
+
+            // Act and Assert
+            _ = Assert.Throws<ArgumentNullException>(() => new MockCentOps(null, mockLogger.Object));
+        }
+
         [Fact]
         public async Task MockCentOpsReturnsChatbotEndpointSingleAsync()
         {

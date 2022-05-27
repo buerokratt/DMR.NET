@@ -1,8 +1,11 @@
-﻿namespace Dmr.Api.Services.MessageForwarder
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Dmr.Api.Services.MessageForwarder
 {
     /// <summary>
     /// Exception of <see cref="MessageForwarderService"/> operations.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class MessageForwarderException : Exception
     {
         public MessageForwarderException() { }

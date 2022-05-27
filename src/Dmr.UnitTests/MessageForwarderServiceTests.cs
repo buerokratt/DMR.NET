@@ -7,6 +7,7 @@ using RichardSzalay.MockHttp;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -17,6 +18,54 @@ namespace Dmr.UnitTests
     /// </summary>
     public class MessageForwarderServiceTests
     {
+        [Fact]
+        public async Task MessageForwarderProcessesEnqueuedMessages()
+        {
+            // Arrange
+            var mockCentOps = new Mock<ICentOps>();
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+               clientFactory.Object,
+               new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+               mockCentOps.Object,
+               logger.Object);
+
+            // Expect the classifier to be called twice.
+            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+                .Respond(HttpStatusCode.Accepted);
+
+            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+                .Respond(HttpStatusCode.Accepted);
+
+            // Act
+            sut.Enqueue(new Message
+            {
+                Payload = "Test Data",
+                Headers = new HeadersInput
+                {
+                    XSendTo = Constants.ClassifierId,
+                    XSentBy = "Police",
+                }
+            });
+
+            sut.Enqueue(new Message
+            {
+                Payload = "Test Data",
+                Headers = new HeadersInput
+                {
+                    XSendTo = Constants.ClassifierId,
+                    XSentBy = "Police",
+                }
+            });
+
+            await sut.ProcessRequestsAsync().ConfigureAwait(true);
+
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
         /// <summary>
         /// Verifies 'null' message payloads result in an <see cref="ArgumentNullException"/> being thrown.
         /// </summary>

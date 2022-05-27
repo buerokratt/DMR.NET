@@ -3,7 +3,7 @@ using Dmr.Api.Services.AsyncProcessor.Extensions;
 namespace Dmr.Api.Services.AsyncProcessor
 {
     /// <summary>
-    /// A background hosted service that periodically triggers the DMR request processor
+    /// A background hosted service that periodically triggers the request processor
     /// </summary>
     public sealed class AsyncProcessorHostedService<TPayload> : IHostedService, IDisposable
     {
