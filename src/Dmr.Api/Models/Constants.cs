@@ -25,12 +25,17 @@
         /// <summary>
         /// Specifies the content type of the message as understood by Buerokratt participants.
         /// </summary>
-        public const string XContentTypeHeaderName = "X-Content-Type";
+        public const string XModelTypeHeaderName = "X-Model-Type";
+
+        /// <summary>
+        /// Specifies the content type of the message.
+        /// </summary>
+        public const string ContentTypeHeaderName = "Content-Type";
 
         /// <summary>
         /// Content type specified when a routing error has occurred.
         /// </summary>
-        public const string ErrorContentType = "application/x.dmr.error+json;version=1";
+        public const string ErrorContentType = "application/vnd.dmr.error+json;version=1";
 
         /// <summary>
         /// The Id of the classifier - specified when a message needs classification.

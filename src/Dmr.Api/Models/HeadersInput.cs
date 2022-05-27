@@ -20,7 +20,10 @@ namespace Dmr.Api.Models
         [FromHeader(Name = Constants.XMessageIdRefHeaderName)]
         public string? XMessageIdRef { get; set; }
 
-        [FromHeader(Name = Constants.XContentTypeHeaderName)]
+        [FromHeader(Name = Constants.XModelTypeHeaderName)]
         public string? XContentType { get; set; }
+
+        [FromHeader(Name = Constants.ContentTypeHeaderName)]
+        public string? ContentType { get; set; }
     }
 }

@@ -95,7 +95,7 @@ namespace Dmr.UnitTests
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
 
-            _ = httpMessageHandler.Expect("http://classifier")
+            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -113,14 +113,152 @@ namespace Dmr.UnitTests
                         Payload = "Test Data",
                         Headers = new HeadersInput
                         {
+                            XSendTo = Constants.ClassifierId,
                             XSentBy = "Police",
-                            XSendTo = Constants.ClassifierId
                         }
                     }).ConfigureAwait(true);
 
             // Assert
             httpMessageHandler.VerifyNoOutstandingExpectation();
         }
+
+        [Fact]
+        public async Task ProcessRequestResolvesAndForwardsMessage()
+        {
+            // Arrange
+            var chatbotId = "bot1";
+            var chatbotEndpoint = new Uri("http://bot1");
+
+            var mockCentOps = new Mock<ICentOps>();
+            _ = mockCentOps.Setup(m => m.TryGetEndpoint(chatbotId)).Returns(Task.FromResult(chatbotEndpoint));
+
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+
+            _ = httpMessageHandler.Expect(HttpMethod.Post, chatbotEndpoint.ToString())
+                .Respond(HttpStatusCode.Accepted);
+
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act
+            await sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput
+                        {
+                            XSendTo = chatbotId,
+                            XSentBy = "Police",
+                        }
+                    }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
+
+        [Fact]
+        public async Task ProcessRequestNotifiesCallerOfForwardingError()
+        {
+            // Arrange
+            var sourceChatbotId = "bot1";
+            var sourceChatbotEndpoint = new Uri("http://bot1");
+            var destinationChatbotId = "bot2";
+            var destinationChatbotEndpoint = new Uri("http://bot2");
+
+            var mockCentOps = new Mock<ICentOps>();
+            _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.TryGetEndpoint(destinationChatbotId)).Returns(Task.FromResult(destinationChatbotEndpoint));
+
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+
+            // Destination chatbot returns an error
+            _ = httpMessageHandler.Expect(HttpMethod.Post, destinationChatbotEndpoint.ToString())
+                .Respond(HttpStatusCode.InternalServerError);
+
+            // Source chatbot receives error callback.
+            _ = httpMessageHandler.Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .Respond(HttpStatusCode.Accepted);
+
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act
+            await sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput
+                        {
+                            XSendTo = destinationChatbotId,
+                            XSentBy = sourceChatbotId,
+                        }
+                    }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
+
+        [Fact]
+        public async Task ProcessRequestNotifiesCallerOfClassificationError()
+        {
+            // Arrange
+            var sourceChatbotId = "bot1";
+            var sourceChatbotEndpoint = new Uri("http://bot1");
+            var destinationChatbotId = "bot2";
+            var destinationChatbotEndpoint = new Uri("http://bot2");
+
+            var mockCentOps = new Mock<ICentOps>();
+            _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+
+            // destination chatbot not found.
+            _ = mockCentOps.Setup(m => m.TryGetEndpoint(destinationChatbotId)).Returns(Task.FromResult<Uri>(null));
+
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+
+            // Source chatbot receives error callback.
+            _ = httpMessageHandler.Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .Respond(HttpStatusCode.Accepted);
+
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act
+            await sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput
+                        {
+                            XSendTo = destinationChatbotId,
+                            XSentBy = sourceChatbotId,
+                        }
+                    }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
+
 
         private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
         {

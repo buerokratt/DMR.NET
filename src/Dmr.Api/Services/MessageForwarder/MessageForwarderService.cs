@@ -39,6 +39,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 if (payload.Headers.XSendTo != Constants.ClassifierId)
                 {
                     await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(true);
+                    return;
                 }
 
                 await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
@@ -120,8 +121,8 @@ namespace Dmr.Api.Services.MessageForwarder
                 content.Headers.Add(Constants.XSendToHeaderName, headers.XSentBy);
                 _ = content.Headers.Remove(Constants.XSentByHeaderName);
                 content.Headers.Add(Constants.XSentByHeaderName, Constants.DmrId);
-                _ = content.Headers.Remove(Constants.XContentTypeHeaderName);
-                content.Headers.Add(Constants.XContentTypeHeaderName, Constants.ErrorContentType);
+                _ = content.Headers.Remove(Constants.XModelTypeHeaderName);
+                content.Headers.Add(Constants.XModelTypeHeaderName, Constants.ErrorContentType);
                 _ = content.Headers.Remove(Constants.XMessageIdRefHeaderName);
                 content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageId);
 
@@ -145,7 +146,9 @@ namespace Dmr.Api.Services.MessageForwarder
             content.Headers.Add(Constants.XSentByHeaderName, headers.XSentBy);
             content.Headers.Add(Constants.XMessageIdHeaderName, headers.XMessageId);
             content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageIdRef);
-            content.Headers.Add(Constants.XContentTypeHeaderName, headers.XContentType);
+            content.Headers.Add(Constants.XModelTypeHeaderName, headers.XContentType);
+            _ = content.Headers.Remove(Constants.ContentTypeHeaderName);
+            content.Headers.Add(Constants.ContentTypeHeaderName, headers.ContentType ?? "text/plain");
 
             return content;
         }
