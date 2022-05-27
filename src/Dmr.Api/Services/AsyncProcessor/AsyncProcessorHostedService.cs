@@ -1,5 +1,4 @@
 using Dmr.Api.Services.AsyncProcessor.Extensions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Dmr.Api.Services.AsyncProcessor
 {
