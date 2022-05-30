@@ -7,11 +7,11 @@ namespace Dmr.Api.Controllers
 {
     [Route("/messages")]
     [ApiController]
-    public class DmrController : ControllerBase
+    public class MessagesController : ControllerBase
     {
         private readonly IAsyncProcessorService<Message> processor;
 
-        public DmrController(IAsyncProcessorService<Message> processor)
+        public MessagesController(IAsyncProcessorService<Message> processor)
         {
             this.processor = processor;
         }
@@ -26,11 +26,6 @@ namespace Dmr.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromHeader] HeadersInput headers)
         {
-            if (headers == null)
-            {
-                return base.BadRequest(ModelState);
-            }
-
             string payload;
             using (StreamReader reader = new(Request.Body, Encoding.UTF8))
             {

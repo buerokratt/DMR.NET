@@ -43,7 +43,7 @@ namespace Dmr.UnitTests
             processor.Verify(p => p.Enqueue(It.Is<Message>(m => m.Payload == ValidTestData)));
         }
 
-        private static DmrController SetupControllerContext(IAsyncProcessorService<Message> service, string input)
+        private static MessagesController SetupControllerContext(IAsyncProcessorService<Message> service, string input)
         {
             // Create a default HttpContext
             var httpContext = new DefaultHttpContext();
@@ -53,7 +53,7 @@ namespace Dmr.UnitTests
             httpContext.Request.Body = stream;
             httpContext.Request.ContentLength = stream.Length;
 
-            return new DmrController(service)
+            return new MessagesController(service)
             {
                 // Set the controller context to our created HttpContext
                 ControllerContext = new ControllerContext()
