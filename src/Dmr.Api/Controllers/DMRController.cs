@@ -21,6 +21,8 @@ namespace Dmr.Api.Controllers
         /// </summary>
         /// <param name="headers">Model bound headers</param>
         /// <returns>204 Accepted or 400 BadRequest</returns>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromHeader] HeadersInput headers)
         {
