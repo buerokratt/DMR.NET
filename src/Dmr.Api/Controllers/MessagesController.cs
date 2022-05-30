@@ -20,8 +20,8 @@ namespace Dmr.Api.Controllers
         /// Accepts 'Post'ed messages with Buerokratt headers and an encoded/encrypted message body. 
         /// </summary>
         /// <param name="headers">Model bound headers</param>
-        /// <returns>204 Accepted or 400 BadRequest</returns>
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        /// <returns>202 Accepted or 400 BadRequest</returns>
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromHeader] HeadersInput headers)
