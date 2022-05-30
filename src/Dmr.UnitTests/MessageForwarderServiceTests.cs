@@ -341,6 +341,63 @@ namespace Dmr.UnitTests
         }
 
         /// <summary>
+        /// Notifies the caller of an error has occurred if calling the classifier fails.
+        /// </summary>
+        [Fact]
+        public async Task ProcessRequestNotifiesCallerIfClassifierFails()
+        {
+            // Arrange
+            var sourceChatbotId = "bot1";
+            var sourceChatbotEndpoint = new Uri("http://bot1");
+
+            var mockCentOps = new Mock<ICentOps>();
+            _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+
+            // Classifier call fails.
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, "http://classifier")
+                .Respond(HttpStatusCode.InternalServerError);
+
+            // Source chatbot receives error callback.
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
+                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithContent(string.Empty)
+                .Respond(HttpStatusCode.Accepted);
+
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act
+            await sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput
+                        {
+                            XSendTo = Constants.ClassifierId,
+                            XSentBy = sourceChatbotId,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111",
+                        }
+                    }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
+        /// <summary>
         /// Notifies the caller of an error has occurred if calling the recipient fails.
         /// </summary>
         [Fact]
@@ -400,11 +457,11 @@ namespace Dmr.UnitTests
         }
 
         /// <summary>
-        /// Notifies the caller of an error has occurred if classification fails.
+        /// Notifies the caller of an error has occurred if centops doesn't find the specified recipient.
         /// Headers should be set accordingly.
         /// </summary>
         [Fact]
-        public async Task ProcessRequestNotifiesCallerOfClassificationError()
+        public async Task ProcessRequestNotifiesCallerOfErrorCentOpsDoesntFindBot()
         {
             // Arrange
             var sourceChatbotId = "bot1";

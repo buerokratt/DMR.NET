@@ -32,7 +32,7 @@ namespace Dmr.Api.Controllers
             string payload;
             using (StreamReader reader = new(Request.Body, Encoding.UTF8))
             {
-                payload = await reader.ReadToEndAsync().ConfigureAwait(true);
+                payload = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 
             processor.Enqueue(new Message { Headers = headers, Payload = payload });

@@ -103,6 +103,7 @@ namespace Dmr.Api.Services.MessageForwarder
             }
             catch (HttpRequestException httpReqException)
             {
+                Logger.ClassifierCallError(httpReqException);
                 throw new MessageForwarderException("Calling classifier failed.", httpReqException);
             }
         }

@@ -19,6 +19,7 @@
 
         /// <summary>
         /// Specified by the recipient service - value indicates the message Id this payload is in response to.
+        /// e.g. application/vnd.classifier;version=1
         /// </summary>
         public const string XMessageIdRefHeaderName = "X-Message-Id-Ref";
 
