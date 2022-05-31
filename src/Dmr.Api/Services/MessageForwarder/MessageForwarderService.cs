@@ -46,7 +46,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 // If classification is specified - forward to the classifier.
                 if (payload.Headers.XSendTo == Constants.ClassifierId)
                 {
-                    await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
+                    await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(false);
                     return;
                 }
 
