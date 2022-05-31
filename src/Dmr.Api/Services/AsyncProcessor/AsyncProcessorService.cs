@@ -38,7 +38,7 @@ namespace Dmr.Api.Services.AsyncProcessor
         {
             while (Requests.TryDequeue(out var request))
             {
-                await ProcessRequestAsync(request).ConfigureAwait(true);
+                await ProcessRequestAsync(request).ConfigureAwait(false);
             }
         }
 
