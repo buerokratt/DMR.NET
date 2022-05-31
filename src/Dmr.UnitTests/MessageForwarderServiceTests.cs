@@ -284,7 +284,7 @@ namespace Dmr.UnitTests
 
             // Assert
             httpMessageHandler.VerifyNoOutstandingExpectation();
-            mockCentOps.Verify(c => c.TryGetEndpoint(It.IsAny<string>()), Times.Never);
+            mockCentOps.Verify(c => c.FetchEndpoint(It.IsAny<string>()), Times.Never);
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace Dmr.UnitTests
             var chatbotEndpoint = new Uri("http://bot1");
 
             var mockCentOps = new Mock<ICentOpsService>();
-            _ = mockCentOps.Setup(m => m.TryGetEndpoint(chatbotId)).Returns(Task.FromResult(chatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.FetchEndpoint(chatbotId)).Returns(Task.FromResult(chatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
@@ -351,7 +351,7 @@ namespace Dmr.UnitTests
             var sourceChatbotEndpoint = new Uri("http://bot1");
 
             var mockCentOps = new Mock<ICentOpsService>();
-            _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.FetchEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
@@ -410,8 +410,8 @@ namespace Dmr.UnitTests
             var destinationChatbotEndpoint = new Uri("http://bot2");
 
             var mockCentOps = new Mock<ICentOpsService>();
-            _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
-            _ = mockCentOps.Setup(m => m.TryGetEndpoint(destinationChatbotId)).Returns(Task.FromResult(destinationChatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.FetchEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.FetchEndpoint(destinationChatbotId)).Returns(Task.FromResult(destinationChatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
@@ -470,10 +470,10 @@ namespace Dmr.UnitTests
             var destinationChatbotEndpoint = new Uri("http://bot2");
 
             var mockCentOps = new Mock<ICentOpsService>();
-            _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.FetchEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             // destination chatbot not found.
-            _ = mockCentOps.Setup(m => m.TryGetEndpoint(destinationChatbotId)).Returns(Task.FromResult<Uri>(null));
+            _ = mockCentOps.Setup(m => m.FetchEndpoint(destinationChatbotId)).Returns(Task.FromResult<Uri>(null));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);

@@ -36,7 +36,7 @@ namespace Dmr.UnitTests
             var mockCentOps = new MockCentOps(settings, mockLogger.Object);
 
             // Act
-            var uri = await mockCentOps.TryGetEndpoint("bot1").ConfigureAwait(true);
+            var uri = await mockCentOps.FetchEndpoint("bot1").ConfigureAwait(true);
 
             // Assert
             Assert.Equal(settings.ChatBots.Single().Endpoint, uri.ToString());
@@ -62,7 +62,7 @@ namespace Dmr.UnitTests
             var mockCentOps = new MockCentOps(settings, mockLogger.Object);
 
             // Act
-            var uri = await mockCentOps.TryGetEndpoint("bot5").ConfigureAwait(true);
+            var uri = await mockCentOps.FetchEndpoint("bot5").ConfigureAwait(true);
 
             // Assert
             Assert.Equal(settings.ChatBots.Last().Endpoint, uri.ToString());
@@ -85,7 +85,7 @@ namespace Dmr.UnitTests
             var mockCentOps = new MockCentOps(settings, mockLogger.Object);
 
             // Act
-            var uri = await mockCentOps.TryGetEndpoint("bot2").ConfigureAwait(true);
+            var uri = await mockCentOps.FetchEndpoint("bot2").ConfigureAwait(true);
 
             // Assert
             Assert.Null(uri);
@@ -108,7 +108,7 @@ namespace Dmr.UnitTests
             var mockCentOps = new MockCentOps(settings, mockLogger.Object);
 
             // Act
-            var uri = await mockCentOps.TryGetEndpoint("bot2").ConfigureAwait(true);
+            var uri = await mockCentOps.FetchEndpoint("bot2").ConfigureAwait(true);
 
             // Assert
             Assert.Null(uri);
@@ -131,7 +131,7 @@ namespace Dmr.UnitTests
             var mockCentOps = new MockCentOps(settings, mockLogger.Object);
 
             // Act
-            var uri = await mockCentOps.TryGetEndpoint("bot2").ConfigureAwait(true);
+            var uri = await mockCentOps.FetchEndpoint("bot2").ConfigureAwait(true);
 
             // Assert
             Assert.Null(uri);

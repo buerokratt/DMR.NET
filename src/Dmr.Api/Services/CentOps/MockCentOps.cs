@@ -27,7 +27,7 @@
                 .ToDictionary(cb => cb.Id ?? string.Empty, cb => new Uri(cb.Endpoint ?? string.Empty), StringComparer.OrdinalIgnoreCase);
         }
 
-        public Task<Uri?> TryGetEndpoint(string chatbotId)
+        public Task<Uri?> FetchEndpoint(string chatbotId)
         {
             return chatbots.ContainsKey(chatbotId)
                 ? Task.FromResult<Uri?>(chatbots[chatbotId])

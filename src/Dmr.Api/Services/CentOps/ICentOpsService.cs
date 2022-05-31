@@ -5,6 +5,6 @@
     /// </summary>
     public interface ICentOpsService
     {
-        Task<Uri?> TryGetEndpoint(string chatbotId);
+        Task<Uri?> FetchEndpoint(string chatbotId);
     }
 }
