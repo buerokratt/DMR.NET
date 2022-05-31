@@ -1,4 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using Dmr.Api.Services.CentOps;
+using Dmr.Api.Services.MessageForwarder;
+using Dmr.Api.Services.MessageForwarder.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dmr.Api
 {
@@ -15,6 +19,14 @@ namespace Dmr.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
+
+            var dmrSettings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
+            builder.Services.AddMessageForwarder(dmrSettings);
+
+            // Add MockCentOps.
+            var mockCentOpsSettings = builder.Configuration.GetSection("MockCentOps").Get<MockCentOpsSettings>();
+            builder.Services.TryAddSingleton(mockCentOpsSettings ?? new MockCentOpsSettings());
+            _ = builder.Services.AddTransient<ICentOpsService, MockCentOps>();
 
             var app = builder.Build();
 
