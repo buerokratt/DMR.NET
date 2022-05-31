@@ -26,7 +26,7 @@ namespace Dmr.Api
             // Add MockCentOps.
             var mockCentOpsSettings = builder.Configuration.GetSection("MockCentOps").Get<MockCentOpsSettings>();
             builder.Services.TryAddSingleton(mockCentOpsSettings ?? new MockCentOpsSettings());
-            _ = builder.Services.AddTransient<ICentOps, MockCentOps>();
+            _ = builder.Services.AddTransient<ICentOpsService, MockCentOps>();
 
             var app = builder.Build();
 

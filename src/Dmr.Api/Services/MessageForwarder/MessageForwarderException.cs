@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace Dmr.Api.Services.MessageForwarder
 {
@@ -12,7 +13,7 @@ namespace Dmr.Api.Services.MessageForwarder
         public MessageForwarderException(string message) : base(message) { }
         public MessageForwarderException(string message, Exception inner) : base(message, inner) { }
         protected MessageForwarderException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+          SerializationInfo info,
+          StreamingContext context) : base(info, context) { }
     }
 }

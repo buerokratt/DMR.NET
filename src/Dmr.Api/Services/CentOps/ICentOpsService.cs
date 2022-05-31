@@ -3,7 +3,7 @@
     /// <summary>
     /// Interface which describes CentOps functionality.
     /// </summary>
-    public interface ICentOps
+    public interface ICentOpsService
     {
         Task<Uri?> TryGetEndpoint(string chatbotId);
     }

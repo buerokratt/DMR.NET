@@ -4,7 +4,7 @@
     /// A simple mock CentOps implementation which is driven by configuration rather than a genuine CentOps service.
     /// This implementation will be replaced when CentOps is implemented.
     /// </summary>
-    public class MockCentOps : ICentOps
+    public class MockCentOps : ICentOpsService
     {
         private readonly ILogger<MockCentOps> logger;
         private readonly IDictionary<string, Uri> chatbots;

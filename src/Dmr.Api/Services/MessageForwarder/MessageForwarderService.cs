@@ -2,6 +2,7 @@ using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
+using System.Net.Http.Headers;
 
 namespace Dmr.Api.Services.MessageForwarder
 {
@@ -10,12 +11,12 @@ namespace Dmr.Api.Services.MessageForwarder
     /// </summary>
     public class MessageForwarderService : AsyncProcessorService<Message, MessageForwarderSettings>
     {
-        private readonly ICentOps centOps;
+        private readonly ICentOpsService centOps;
 
         public MessageForwarderService(
             IHttpClientFactory httpClientFactory,
             MessageForwarderSettings config,
-            ICentOps centOps,
+            ICentOpsService centOps,
             ILogger<MessageForwarderService> logger) :
                 base(httpClientFactory, config, logger)
         {
@@ -46,12 +47,12 @@ namespace Dmr.Api.Services.MessageForwarder
                 // If classification is specified - forward to the classifier.
                 if (payload.Headers.XSendTo == Constants.ClassifierId)
                 {
-                    await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(true);
+                    await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(false);
                     return;
                 }
 
                 // If a recipient is specified - resolve the recipient's endpoint and forward the message.
-                await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(true);
+                await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(false);
             }
             catch (MessageForwarderException)
             {
@@ -71,14 +72,14 @@ namespace Dmr.Api.Services.MessageForwarder
 
             try
             {
-                participantEndpoint = await centOps.TryGetEndpoint(headers.XSendTo).ConfigureAwait(true);
+                participantEndpoint = await centOps.TryGetEndpoint(headers.XSendTo).ConfigureAwait(false);
                 if (participantEndpoint == null)
                 {
                     throw new KeyNotFoundException($"Participant not found with id '{headers.XSendTo}'");
                 }
 
                 using var content = GetDefaultRequestContent(payload, headers);
-                var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(true);
+                var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(false);
                 _ = response.EnsureSuccessStatusCode();
             }
             catch (KeyNotFoundException knfException)
@@ -98,7 +99,7 @@ namespace Dmr.Api.Services.MessageForwarder
             try
             {
                 using var content = GetDefaultRequestContent(payload, headers);
-                var response = await HttpClient.PostAsync(Config.ClassifierUri, content).ConfigureAwait(true);
+                var response = await HttpClient.PostAsync(Config.ClassifierUri, content).ConfigureAwait(false);
                 _ = response.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException httpReqException)
@@ -119,7 +120,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
             try
             {
-                participantEndpoint = await centOps.TryGetEndpoint(headers.XSentBy).ConfigureAwait(true);
+                participantEndpoint = await centOps.TryGetEndpoint(headers.XSentBy).ConfigureAwait(false);
                 if (participantEndpoint == null)
                 {
                     throw new KeyNotFoundException($"Participant not found with id '{headers.XSentBy}'");
@@ -137,7 +138,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 _ = content.Headers.Remove(Constants.XMessageIdRefHeaderName);
                 content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageId);
 
-                var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(true);
+                var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(false);
                 _ = response.EnsureSuccessStatusCode();
             }
             catch (KeyNotFoundException knfException)
@@ -160,8 +161,7 @@ namespace Dmr.Api.Services.MessageForwarder
             content.Headers.Add(Constants.XModelTypeHeaderName, headers.XModelType);
 
             // Unless specified by the caller - the use the text/plain mime type.
-            _ = content.Headers.Remove(Constants.ContentTypeHeaderName);
-            content.Headers.Add(Constants.ContentTypeHeaderName, headers.ContentType ?? "text/plain");
+            _ = content.Headers.ContentType = new MediaTypeHeaderValue(headers.ContentType ?? "text/plain");
 
             return content;
         }

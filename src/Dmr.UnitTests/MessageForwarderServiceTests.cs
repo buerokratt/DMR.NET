@@ -23,7 +23,7 @@ namespace Dmr.UnitTests
         public void MessageForwarderThrowsForNullClientFactory()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
 
             // Act && Assert
@@ -38,7 +38,7 @@ namespace Dmr.UnitTests
         public void MessageForwarderThrowsForNullConfiguration()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -55,7 +55,7 @@ namespace Dmr.UnitTests
         public async Task MessageForwarderProcessesEnqueuedMessages()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -106,7 +106,7 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncThrowsForNullMessage()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -128,7 +128,7 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncThrowsForNullPayload()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -161,7 +161,7 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncThrowsForMissingHeaders()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -189,7 +189,7 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncThrowsForMissingXSentBy()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -217,7 +217,7 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncThrowsForMissingXSendTo()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -245,7 +245,7 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncCallsClassifierIfSpecified()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
 
@@ -297,7 +297,7 @@ namespace Dmr.UnitTests
             var chatbotId = "bot1";
             var chatbotEndpoint = new Uri("http://bot1");
 
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             _ = mockCentOps.Setup(m => m.TryGetEndpoint(chatbotId)).Returns(Task.FromResult(chatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
@@ -350,7 +350,7 @@ namespace Dmr.UnitTests
             var sourceChatbotId = "bot1";
             var sourceChatbotEndpoint = new Uri("http://bot1");
 
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
@@ -409,7 +409,7 @@ namespace Dmr.UnitTests
             var destinationChatbotId = "bot2";
             var destinationChatbotEndpoint = new Uri("http://bot2");
 
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
             _ = mockCentOps.Setup(m => m.TryGetEndpoint(destinationChatbotId)).Returns(Task.FromResult(destinationChatbotEndpoint));
 
@@ -469,7 +469,7 @@ namespace Dmr.UnitTests
             var destinationChatbotId = "bot2";
             var destinationChatbotEndpoint = new Uri("http://bot2");
 
-            var mockCentOps = new Mock<ICentOps>();
+            var mockCentOps = new Mock<ICentOpsService>();
             _ = mockCentOps.Setup(m => m.TryGetEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             // destination chatbot not found.
