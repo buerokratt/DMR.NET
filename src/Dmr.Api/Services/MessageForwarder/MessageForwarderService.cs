@@ -2,7 +2,6 @@ using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
-using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 
@@ -60,9 +59,9 @@ namespace Dmr.Api.Services.MessageForwarder
             }
             catch (MessageForwarderException)
             {
+                // If something went wrong - notify the sender, only if it makes sense to do so.
                 if (payload.Headers.XSentBy != Constants.ClassifierId)
                 {
-                    // If something went wrong - notify the sender.
                     await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
                 }
             }

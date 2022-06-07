@@ -23,7 +23,7 @@
         private static readonly Action<ILogger, string, string, Exception?> dmrRoutingStatus =
             LoggerMessage.Define<string, string>(
                 LogLevel.Information,
-                new EventId(4, nameof(ClassifierCallError)),
+                new EventId(4, nameof(DmrRoutingStatus)),
                 "Dmr routing '{Source}' ----> '{Target}'");
 
         public static void ClassifierCallError(this ILogger logger, Exception ex)
