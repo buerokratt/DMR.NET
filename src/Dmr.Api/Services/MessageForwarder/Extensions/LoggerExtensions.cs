@@ -26,6 +26,11 @@
                 new EventId(4, nameof(DmrRoutingStatus)),
                 "Dmr routing '{Source}' ----> '{Target}'");
 
+        /// <summary>
+        /// Creates a log message/event when a Classifier call fails.
+        /// </summary>
+        /// <param name="logger">extended ILogger</param>
+        /// <param name="ex">Exception which occurred, if any.</param>
         public static void ClassifierCallError(this ILogger logger, Exception ex)
         {
             classifierCallFailed(logger, ex);

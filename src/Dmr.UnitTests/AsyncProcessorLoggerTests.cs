@@ -33,7 +33,7 @@ namespace Dmr.UnitTests
             loggerMock.Object.AsyncProcessorStateChange("started");
 
             loggerMock.Verify(x => x.Log(
-                LogLevel.Error,
+                LogLevel.Information,
                 new EventId(11, "AsyncProcessorStateChange"),
                 It.Is<It.IsAnyType>((v, t) => true),
                 It.IsAny<ArgumentNullException>(),
