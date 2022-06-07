@@ -62,7 +62,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 // If something went wrong - notify the sender, only if it makes sense to do so.
                 if (payload.Headers.XSentBy != Constants.ClassifierId)
                 {
-                    await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
+                    await NotifySenderOfError(payload.Headers).ConfigureAwait(false);
                 }
             }
         }
