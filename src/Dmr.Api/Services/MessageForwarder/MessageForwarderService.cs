@@ -2,6 +2,7 @@ using Dmr.Api.Models;
 using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 
@@ -45,23 +46,25 @@ namespace Dmr.Api.Services.MessageForwarder
 
             try
             {
+                Logger.DmrRoutingStatus(payload.Headers.XSentBy, payload.Headers.XSendTo);
+
                 // If classification is specified - forward to the classifier.
                 if (payload.Headers.XSendTo == Constants.ClassifierId)
                 {
-                    Logger.DmrRoutingStatus("Classifier");
                     await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(false);
                     return;
                 }
 
                 // If a recipient is specified - resolve the recipient's endpoint and forward the message.
-                Logger.DmrRoutingStatus(payload.Headers.XSendTo);
                 await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(false);
             }
             catch (MessageForwarderException)
             {
-                // If something went wrong - notify the sender.
-                Logger.DmrRoutingStatus($"Error Recipient: {payload.Headers.XSentBy}");
-                await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
+                if (payload.Headers.XSentBy != Constants.ClassifierId)
+                {
+                    // If something went wrong - notify the sender.
+                    await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
+                }
             }
         }
 
