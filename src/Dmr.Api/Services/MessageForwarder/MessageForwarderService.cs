@@ -3,6 +3,7 @@ using Dmr.Api.Services.AsyncProcessor;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder.Extensions;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 
 namespace Dmr.Api.Services.MessageForwarder
 {
@@ -47,16 +48,19 @@ namespace Dmr.Api.Services.MessageForwarder
                 // If classification is specified - forward to the classifier.
                 if (payload.Headers.XSendTo == Constants.ClassifierId)
                 {
+                    Logger.DmrRoutingStatus("Classifier");
                     await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(false);
                     return;
                 }
 
                 // If a recipient is specified - resolve the recipient's endpoint and forward the message.
+                Logger.DmrRoutingStatus(payload.Headers.XSendTo);
                 await ResolveRecipientAndForward(payload.Payload, payload.Headers).ConfigureAwait(false);
             }
             catch (MessageForwarderException)
             {
                 // If something went wrong - notify the sender.
+                Logger.DmrRoutingStatus($"Error Recipient: {payload.Headers.XSentBy}");
                 await NotifySenderOfError(payload.Headers).ConfigureAwait(true);
             }
         }
@@ -161,7 +165,7 @@ namespace Dmr.Api.Services.MessageForwarder
             content.Headers.Add(Constants.XModelTypeHeaderName, headers.XModelType);
 
             // Unless specified by the caller - the use the text/plain mime type.
-            _ = content.Headers.ContentType = new MediaTypeHeaderValue(headers.ContentType ?? "text/plain");
+            _ = content.Headers.ContentType = MediaTypeHeaderValue.Parse(headers.ContentType ?? MediaTypeNames.Text.Plain);
 
             return content;
         }

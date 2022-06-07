@@ -20,6 +20,12 @@
                new EventId(3, nameof(ChatbotCallError)),
                "Error calling chatbot = '{ChatbotId}' at '{ChatbotEndpoint}");
 
+        private static readonly Action<ILogger, string, Exception?> dmrRoutingStatus =
+            LoggerMessage.Define<string>(
+                LogLevel.Error,
+                new EventId(4, nameof(ClassifierCallError)),
+                "Dmr routing to '{Target}'");
+
         public static void ClassifierCallError(this ILogger logger, Exception ex)
         {
             classifierCallFailed(logger, ex);
@@ -46,6 +52,16 @@
         public static void ChatbotCallError(this ILogger logger, string chatbotId, Uri? chatbotEndpoint, Exception ex)
         {
             chatbotCallFailed(logger, chatbotId, chatbotEndpoint?.ToString() ?? string.Empty, ex);
+        }
+
+        /// <summary>
+        /// Creates a log to indicate the DMR routing status of this message.
+        /// </summary>
+        /// <param name="logger">extended ILogger</param>
+        /// <param name="target">routing target</param>
+        public static void DmrRoutingStatus(this ILogger logger, string target)
+        {
+            dmrRoutingStatus(logger, target, null);
         }
     }
 }

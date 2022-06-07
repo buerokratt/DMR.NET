@@ -11,7 +11,7 @@
 
         private static readonly Action<ILogger, string, Exception?> processorTelemetry =
            LoggerMessage.Define<string>(
-               LogLevel.Error,
+               LogLevel.Information,
                new EventId(11, nameof(AsyncProcessorStateChange)),
                "AsyncProcessor '{State}'");
 
