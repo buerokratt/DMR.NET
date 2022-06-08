@@ -1,4 +1,6 @@
+using Dmr.Api.Services.AsyncProcessor.Extensions;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Dmr.Api.Services.AsyncProcessor
 {
@@ -37,9 +39,17 @@ namespace Dmr.Api.Services.AsyncProcessor
 
         public async Task ProcessRequestsAsync()
         {
+            var stopwatch = Stopwatch.StartNew();
+            var processedRequests = 0;
             while (Requests.TryDequeue(out var request))
             {
                 await ProcessRequestAsync(request).ConfigureAwait(false);
+                processedRequests++;
+            }
+
+            if (processedRequests > 0)
+            {
+                Logger.AsyncProcessorTelemetry(processedRequests, stopwatch.ElapsedMilliseconds);
             }
         }
 
