@@ -33,8 +33,24 @@ namespace Dmr.UnitTests
             loggerMock.Object.AsyncProcessorStateChange("started");
 
             loggerMock.Verify(x => x.Log(
-                LogLevel.Error,
+                LogLevel.Information,
                 new EventId(11, "AsyncProcessorStateChange"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<ArgumentNullException>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+        }
+
+        [Fact]
+        public void AsyncProcessorTelemetryLoggerTest()
+        {
+            var loggerMock = new Mock<ILogger>();
+            _ = loggerMock.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+
+            loggerMock.Object.AsyncProcessorTelemetry(1, 1000L);
+
+            loggerMock.Verify(x => x.Log(
+                LogLevel.Information,
+                new EventId(12, "AsyncProcessorTelemetry"),
                 It.Is<It.IsAnyType>((v, t) => true),
                 It.IsAny<ArgumentNullException>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));

@@ -11,9 +11,15 @@
 
         private static readonly Action<ILogger, string, Exception?> processorTelemetry =
            LoggerMessage.Define<string>(
-               LogLevel.Error,
+               LogLevel.Information,
                new EventId(11, nameof(AsyncProcessorStateChange)),
                "AsyncProcessor '{State}'");
+
+        private static readonly Action<ILogger, int, long, Exception?> processorStats =
+          LoggerMessage.Define<int, long>(
+              LogLevel.Information,
+              new EventId(12, nameof(AsyncProcessorTelemetry)),
+              "AsyncProcessor processed '{NumRequests}' requests in '{MillisecondsElapsed}' milliseconds");
 
         public static void AsyncProcessorFailed(this ILogger logger, Exception ex)
         {
@@ -23,6 +29,11 @@
         public static void AsyncProcessorStateChange(this ILogger logger, string state)
         {
             processorTelemetry(logger, state, null);
+        }
+
+        public static void AsyncProcessorTelemetry(this ILogger logger, int numRequests, long millisecondsElapsed)
+        {
+            processorStats(logger, numRequests, millisecondsElapsed, null);
         }
     }
 }
