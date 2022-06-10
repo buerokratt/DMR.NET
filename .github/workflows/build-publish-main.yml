@@ -40,7 +40,7 @@ jobs:
       run: |
         cosign sign \
           -a "ref=${{ github.sha }}" \
-          --upload=false \
+          --upload=true \
           $DOCKER_TAG_SHA
       env:
         COSIGN_EXPERIMENTAL: "true"
