@@ -2,7 +2,7 @@ name: DMR Build and Publish Pipeline
 
 on:
   push:
-    branches: [ main, issues/8/replicate-k8s-cicd ]
+    branches: [ main ]
 
 jobs:
   PackageDeploy:
@@ -46,7 +46,7 @@ jobs:
         COSIGN_EXPERIMENTAL: "true"
   app_deployment:
     env:
-      cd_workflow_dispatch_file_name: app-deployment.yml
+      cd_workflow_dispatch_file_name: cd-app-deployment.yml
       infrastructure_repo_path: buerokratt/Infrastructure
       app_name: dmr
     runs-on:
@@ -59,6 +59,6 @@ jobs:
     steps:
       - name: Initiate k8s app deployment
         run: |
-          gh workflow run $cd_workflow_dispatch_file_name -f app_name=$app_name -f image_tag=${GITHUB_SHA} --repo $infrastructure_repo_path --ref issues/8/replicate-k8s-cicd
+          gh workflow run $cd_workflow_dispatch_file_name -f app_name=$app_name -f image_tag=${GITHUB_SHA} --repo $infrastructure_repo_path --ref main
         env:
           GITHUB_TOKEN: ${{ secrets.MULTI_REPO_WORKFLOW_ACCESS_TOKEN }}
