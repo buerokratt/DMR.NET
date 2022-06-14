@@ -1,9 +1,9 @@
 using Dmr.Api.Controllers;
-using Dmr.Api.Models;
-using Dmr.Api.Services.AsyncProcessor;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using RequestProcessor.AsyncProcessor;
+using RequestProcessor.Models;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;

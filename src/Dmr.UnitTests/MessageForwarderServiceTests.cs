@@ -1,8 +1,8 @@
-﻿using Dmr.Api.Models;
-using Dmr.Api.Services.CentOps;
+﻿using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder;
 using Microsoft.Extensions.Logging;
 using Moq;
+using RequestProcessor.Models;
 using RichardSzalay.MockHttp;
 using System;
 using System.Net;

@@ -1,6 +1,6 @@
-using Dmr.Api.Models;
-using Dmr.Api.Services.AsyncProcessor;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using RequestProcessor.AsyncProcessor;
+using RequestProcessor.Models;
 
 namespace Dmr.Api.Services.MessageForwarder.Extensions
 {
