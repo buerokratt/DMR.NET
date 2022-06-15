@@ -1,4 +1,4 @@
-using Dmr.Api.Services.AsyncProcessor;
+using RequestProcessor.AsyncProcessor;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Dmr.Api.Services.MessageForwarder

@@ -1,6 +1,6 @@
-﻿using Dmr.Api.Models;
-using Dmr.Api.Services.AsyncProcessor;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using RequestProcessor.AsyncProcessor;
+using RequestProcessor.Models;
 using System.Text;
 
 namespace Dmr.Api.Controllers
