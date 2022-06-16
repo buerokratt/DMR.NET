@@ -61,4 +61,4 @@ jobs:
         run: |
           gh workflow run $cd_workflow_dispatch_file_name -f app_name=$app_name -f image_tag=${GITHUB_SHA} --repo $infrastructure_repo_path --ref main
         env:
-          GITHUB_TOKEN: ${{ secrets.MULTI_REPO_WORKFLOW_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_MULTI_REPO_WORKFLOW_ACCESS }}
