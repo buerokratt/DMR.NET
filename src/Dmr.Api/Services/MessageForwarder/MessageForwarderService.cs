@@ -166,7 +166,7 @@ namespace Dmr.Api.Services.MessageForwarder
             content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageIdRef);
             content.Headers.Add(Constants.XModelTypeHeaderName, headers.XModelType);
 
-            // Unless specified by the caller - the use the text/plain mime type.
+            // Unless specified by the caller - use the text/plain mime type.
             _ = content.Headers.ContentType = MediaTypeHeaderValue.Parse(headers.ContentType ?? MediaTypeNames.Text.Plain);
 
             return content;
