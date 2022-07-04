@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using Dmr.Api.Services.CentOps;
 using Dmr.Api.Services.MessageForwarder;
@@ -23,10 +24,9 @@ namespace Dmr.Api
             var dmrSettings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
             builder.Services.AddMessageForwarder(dmrSettings);
 
-            // Add MockCentOps.
-            var mockCentOpsSettings = builder.Configuration.GetSection("MockCentOps").Get<MockCentOpsSettings>();
-            builder.Services.TryAddSingleton(mockCentOpsSettings ?? new MockCentOpsSettings());
-            _ = builder.Services.AddTransient<ICentOpsService, MockCentOps>();
+            _ = builder.Services.AddHostedService<ParticipantPoller>();
+            _ = builder.Services.AddTransient<ICentOpsService, CentOpsService>();
+            _ = builder.Services.AddSingleton<ConcurrentDictionary<string, Participant>>();
 
             var app = builder.Build();
 
