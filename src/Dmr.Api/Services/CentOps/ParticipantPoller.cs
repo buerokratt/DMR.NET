@@ -9,39 +9,31 @@ namespace Dmr.Api.Services.CentOps
     {
         private const string PublicParticipantsEndpoint = "public/participants";
         private const string ApiKeyHeaderName = "X-Api-Key";
-        private readonly HttpClient _httpClient;
         private readonly MessageForwarderSettings _settings;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly ConcurrentDictionary<string, Participant> _participants;
-        private readonly ILogger<CentOpsService> _logger;
+        private readonly ILogger<ParticipantPoller> _logger;
 
         public ParticipantPoller(
             IHttpClientFactory httpClientFactory,
             MessageForwarderSettings settings,
             ConcurrentDictionary<string, Participant> participants,
-            ILogger<CentOpsService> logger)
+            ILogger<ParticipantPoller> logger)
         {
-            if (httpClientFactory == null)
-            {
-                throw new ArgumentNullException(nameof(httpClientFactory));
-            }
-
-            if (settings == null)
-            {
-                throw new ArgumentNullException(nameof(settings));
-            }
-
-            _httpClient = httpClientFactory.CreateClient("CentOpsClient");
-            _httpClient.DefaultRequestHeaders.Add(ApiKeyHeaderName, settings.CentOpsApiKey);
-            _settings = settings;
-            _participants = participants;
-            _logger = logger;
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _participants = participants ?? throw new ArgumentNullException(nameof(participants));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var httpClient = _httpClientFactory.CreateClient("CentOpsClient");
+            httpClient.DefaultRequestHeaders.Add(ApiKeyHeaderName, _settings.CentOpsApiKey);
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                await RefreshCache(stoppingToken).ConfigureAwait(false);
+                await RefreshCache(httpClient, stoppingToken).ConfigureAwait(false);
                 await Task
                     .Delay(
                         _settings.ParticipantCacheRefreshIntervalMs,
@@ -50,12 +42,12 @@ namespace Dmr.Api.Services.CentOps
             }
         }
 
-        private async Task RefreshCache(CancellationToken cancellationToken)
+        private async Task RefreshCache(HttpClient httpClient, CancellationToken cancellationToken)
         {
             try
             {
                 var centOpsParticipantsUri = new Uri(_settings.CentOpsUri!, PublicParticipantsEndpoint);
-                var participantList = await _httpClient!.GetFromJsonAsync<IEnumerable<Participant>>(centOpsParticipantsUri, cancellationToken).ConfigureAwait(false);
+                var participantList = await httpClient!.GetFromJsonAsync<IEnumerable<Participant>>(centOpsParticipantsUri, cancellationToken).ConfigureAwait(false);
                 if (participantList != null)
                 {
                     _logger.RefreshingParticipantCache();
@@ -66,10 +58,7 @@ namespace Dmr.Api.Services.CentOps
                         _ = _participants.AddOrUpdate(
                             participant.Name!,
                             participant,
-                            (key, old) =>
-                            {
-                                return participant;
-                            });
+                            (key, old) => participant);
                     }
 
                     // Remove items which are no longer availiable.
