@@ -247,6 +247,8 @@ namespace Dmr.UnitTests
             // Arrange
             var mockCentOps = new Mock<ICentOpsService>();
             Mock<ILogger<MessageForwarderService>> logger = new();
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+
             using MockHttpMessageHandler httpMessageHandler = new();
 
             _ = httpMessageHandler
@@ -285,6 +287,12 @@ namespace Dmr.UnitTests
             // Assert
             httpMessageHandler.VerifyNoOutstandingExpectation();
             mockCentOps.Verify(c => c.FetchEndpointByName(It.IsAny<string>()), Times.Never);
+            logger.Verify(x => x.Log(
+                LogLevel.Information,
+                new EventId(4, "DmrRoutingStatus"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<ArgumentNullException>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
 
         /// <summary>
