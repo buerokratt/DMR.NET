@@ -31,10 +31,10 @@ namespace Dmr.UnitTests
             var destinationChatbotId = "bot2";
 
             var mockCentOps = new Mock<ICentOpsService>();
-            _ = mockCentOps.Setup(m => m.FetchEndpoint(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+            _ = mockCentOps.Setup(m => m.FetchEndpointByName(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             // destination chatbot not found.
-            _ = mockCentOps.Setup(m => m.FetchEndpoint(destinationChatbotId)).Returns(Task.FromResult<Uri>(null));
+            _ = mockCentOps.Setup(m => m.FetchEndpointByName(destinationChatbotId)).Returns(Task.FromResult<Uri>(null));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
@@ -91,7 +91,7 @@ namespace Dmr.UnitTests
 
             var mockCentOps = new Mock<ICentOpsService>();
             // Finding the destination chatbot throws.
-            _ = mockCentOps.Setup(m => m.FetchEndpoint(destinationChatbotId)).Throws<HttpRequestException>();
+            _ = mockCentOps.Setup(m => m.FetchEndpointByName(destinationChatbotId)).Throws<HttpRequestException>();
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);

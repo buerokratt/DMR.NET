@@ -78,7 +78,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
             try
             {
-                participantEndpoint = await centOps.FetchEndpoint(headers.XSendTo).ConfigureAwait(false);
+                participantEndpoint = await centOps.FetchEndpointByName(headers.XSendTo).ConfigureAwait(false);
                 if (participantEndpoint == null)
                 {
                     throw new KeyNotFoundException($"Participant not found with id '{headers.XSendTo}'");
@@ -126,7 +126,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
             try
             {
-                participantEndpoint = await centOps.FetchEndpoint(headers.XSentBy).ConfigureAwait(false);
+                participantEndpoint = await centOps.FetchEndpointByName(headers.XSentBy).ConfigureAwait(false);
                 if (participantEndpoint == null)
                 {
                     throw new KeyNotFoundException($"Participant with id '{headers.XSendTo}' not found");

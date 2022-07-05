@@ -8,6 +8,15 @@ namespace Dmr.UnitTests
 {
     public class ServiceCollectionExtensionsTests
     {
+        [Fact]
+        public void ServiceCollectionExtensionThrowsForNullSettings()
+        {
+            // Arrange
+            var services = new ServiceCollection();
+
+            //Act & Assert
+            _ = Assert.Throws<ArgumentNullException>(() => ServiceCollectionExtensions.AddMessageForwarder(services, null));
+        }
 
         [Fact]
         public void ServiceCollectionExtensionsAreServicesAdded()
