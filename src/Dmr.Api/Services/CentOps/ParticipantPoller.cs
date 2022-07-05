@@ -20,10 +20,10 @@ namespace Dmr.Api.Services.CentOps
             ConcurrentDictionary<string, Participant> participants,
             ILogger<ParticipantPoller> logger)
         {
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-            _participants = participants ?? throw new ArgumentNullException(nameof(participants));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _settings = settings;
+            _httpClientFactory = httpClientFactory;
+            _participants = participants;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

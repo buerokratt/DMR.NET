@@ -17,69 +17,6 @@ namespace Dmr.UnitTests
     public class ParticipantPollerTests
     {
         [Fact]
-        public void ThrowsForMissingClientFactory()
-        {
-            // Arrange
-            var logger = new Mock<ILogger<ParticipantPoller>>();
-
-            // Act & Assert
-            _ = Assert.Throws<ArgumentNullException>(
-                () => new ParticipantPoller(
-                    null,
-                    new MessageForwarderSettings(),
-                    new ConcurrentDictionary<string, Participant>(),
-                    logger.Object));
-        }
-
-        [Fact]
-        public void ThrowsForMissingSettings()
-        {
-            // Arrange
-            var httpClientFactory = new Mock<IHttpClientFactory>();
-            var logger = new Mock<ILogger<ParticipantPoller>>();
-
-            // Act & Assert
-            _ = Assert.Throws<ArgumentNullException>(
-                () => new ParticipantPoller(
-                    httpClientFactory.Object,
-                    null,
-                    new ConcurrentDictionary<string, Participant>(),
-                    logger.Object));
-        }
-
-        [Fact]
-        public void ThrowsForMissingParticipantStorage()
-        {
-            // Arrange
-            var httpClientFactory = new Mock<IHttpClientFactory>();
-            var logger = new Mock<ILogger<ParticipantPoller>>();
-
-            // Act & Assert
-            _ = Assert.Throws<ArgumentNullException>(
-                () => new ParticipantPoller(
-                    httpClientFactory.Object,
-                    new MessageForwarderSettings(),
-                    null,
-                    logger.Object));
-        }
-
-        [Fact]
-        public void ThrowsForMissingLogger()
-        {
-            // Arrange
-            var httpClientFactory = new Mock<IHttpClientFactory>();
-            var logger = new Mock<ILogger<ParticipantPoller>>();
-
-            // Act & Assert
-            _ = Assert.Throws<ArgumentNullException>(
-                () => new ParticipantPoller(
-                    httpClientFactory.Object,
-                    new MessageForwarderSettings(),
-                    new ConcurrentDictionary<string, Participant>(),
-                    null));
-        }
-
-        [Fact]
         public async Task RunsAsyncAndCallsCentOps()
         {
             // Arrange
