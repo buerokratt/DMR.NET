@@ -23,16 +23,19 @@ namespace Dmr.UnitTests
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
             var logger = new Mock<ILogger<ParticipantPoller>>();
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+
             var settings = new MessageForwarderSettings
             {
                 CentOpsApiKey = "key",
                 CentOpsUri = new Uri("http://centops"),
             };
 
+            var memoryStore = new ConcurrentDictionary<string, Participant>();
             var sut = new ParticipantPoller(
                 clientFactory.Object,
                 settings,
-                new ConcurrentDictionary<string, Participant>(),
+                memoryStore,
                 logger.Object);
 
             var cancellationToken = new CancellationToken();
@@ -52,7 +55,8 @@ namespace Dmr.UnitTests
                             {
                                 Host = "http://bot1",
                                 Id = "1",
-                                Name = "bot1"
+                                Name = "bot1",
+                                Type = ParticipantType.Chatbot
                             }
                         }));
 
@@ -62,6 +66,76 @@ namespace Dmr.UnitTests
             // Assert
             await Task.Delay(1000).ConfigureAwait(true);
             await sut.StopAsync(cancellationToken).ConfigureAwait(true);
+
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+
+            logger.Verify(x => x.Log(
+                LogLevel.Information,
+                new EventId(4, "RefreshingParticipantCache"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(1));
+
+            logger.Verify(x => x.Log(
+                LogLevel.Information,
+                new EventId(5, "ParticipantCacheRefreshed"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(1));
+
+            var bot1 = Assert.Single(memoryStore.Values);
+            Assert.Equal(ParticipantType.Chatbot, bot1.Type);
+        }
+
+        [Fact]
+        public async Task HandlesAndReportsFailure()
+        {
+            // Arrange
+            using MockHttpMessageHandler httpMessageHandler = new();
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+            var logger = new Mock<ILogger<ParticipantPoller>>();
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+
+            var settings = new MessageForwarderSettings
+            {
+                CentOpsApiKey = "key",
+                CentOpsUri = new Uri("http://centops"),
+            };
+
+            var memoryStore = new ConcurrentDictionary<string, Participant>();
+            var sut = new ParticipantPoller(
+                clientFactory.Object,
+                settings,
+                memoryStore,
+                logger.Object);
+
+            var cancellationToken = new CancellationToken();
+
+            // Expect the CentOps API to be called.
+            _ = httpMessageHandler
+                .Expect(
+                    HttpMethod.Get,
+                    new Uri(settings.CentOpsUri, "public/participants").ToString())
+                .WithHeaders("X-Api-Key", settings.CentOpsApiKey)
+                .Throw(new HttpRequestException("That didn't work"));
+
+            // Act
+            await sut.StartAsync(cancellationToken).ConfigureAwait(false);
+
+            // Assert
+            await Task.Delay(1000).ConfigureAwait(true);
+            await sut.StopAsync(cancellationToken).ConfigureAwait(true);
+
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+
+            logger.Verify(x => x.Log(
+                LogLevel.Critical,
+                new EventId(6, "ParticipantCacheRefreshFailure"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(1));
+
+            Assert.Empty(memoryStore.Values);
         }
 
         [Fact]

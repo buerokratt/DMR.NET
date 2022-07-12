@@ -86,7 +86,7 @@ namespace Dmr.UnitTests
         }
 
         [Fact]
-        public async Task ReturnsNoPariticipantsIfNoneOfTypeExist()
+        public async Task ReturnsNoParticipantsIfNoneOfTypeExist()
         {
             // Arrange
             var participant1 = new Participant { Host = "https://classifier/", Id = "1", Name = "classifier", Type = ParticipantType.Classifier };
