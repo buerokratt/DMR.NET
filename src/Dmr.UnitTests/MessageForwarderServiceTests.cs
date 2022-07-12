@@ -5,6 +5,7 @@ using Moq;
 using RequestProcessor.Models;
 using RichardSzalay.MockHttp;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -344,6 +345,58 @@ namespace Dmr.UnitTests
                             XModelType = DefaultModelType,
                             XMessageId = "2222",
                             XMessageIdRef = "1111"
+                        }
+                    }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
+        [Fact]
+        public async Task ProcessRequestNotifiedCallerIfNoClassifiersFound()
+        {
+            // Arrange
+            var sourceChatbotId = "bot1";
+            var sourceChatbotEndpoint = new Uri("http://bot1");
+
+            var mockCentOps = new Mock<ICentOpsService>();
+
+            // No Classifiers found.
+            _ = mockCentOps.Setup(m => m.FetchParticipantsByType(ParticipantType.Classifier)).ReturnsAsync(Enumerable.Empty<Participant>());
+            _ = mockCentOps.Setup(m => m.FetchEndpointByName(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+
+            // Source chatbot receives error callback.
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
+                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithContent(string.Empty)
+                .Respond(HttpStatusCode.Accepted);
+
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings(),
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act
+            await sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput
+                        {
+                            XSendTo = Constants.ClassifierId,
+                            XSentBy = sourceChatbotId,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111",
                         }
                     }).ConfigureAwait(true);
 
