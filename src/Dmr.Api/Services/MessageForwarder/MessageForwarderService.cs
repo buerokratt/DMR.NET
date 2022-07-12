@@ -145,7 +145,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 participantEndpoint = await centOps.FetchEndpointByName(headers.XSentBy).ConfigureAwait(false);
                 if (participantEndpoint == null)
                 {
-                    throw new KeyNotFoundException($"Participant with id '{headers.XSendTo}' not found");
+                    throw new KeyNotFoundException($"Participant with id '{headers.XSentBy}' not found");
                 }
 
                 using var content = GetDefaultRequestContent(string.Empty, headers);
