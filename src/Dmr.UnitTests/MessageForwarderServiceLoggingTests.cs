@@ -16,7 +16,7 @@ namespace Dmr.UnitTests
     /// <summary>
     /// A collection of tests for the core DMR routing logic as it relates to logging specificially.
     /// </summary>
-    public class MessageForwarderServiceLoggingTests
+    public class MessageForwarderServiceLoggingTests : DmrBaseTest
     {
         /// <summary>
         /// Validates the correct logging is performed when CentOps doesn't have an entry for the destination bot.
@@ -50,7 +50,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -101,7 +101,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -138,7 +138,7 @@ namespace Dmr.UnitTests
             var sourceChatbotId = "bot1";
             var sourceChatbotEndpoint = new Uri("http://bot1");
 
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
 
             Mock<ILogger<MessageForwarderService>> logger = new();
             _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
@@ -154,7 +154,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 

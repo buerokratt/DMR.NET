@@ -15,7 +15,7 @@ namespace Dmr.UnitTests
     /// <summary>
     /// A collection of tests for the core DMR routing logic.
     /// </summary>
-    public class MessageForwarderServiceTests
+    public class MessageForwarderServiceTests : DmrBaseTest
     {
         private const string DefaultModelType = "application/vnd.buerokratt;version=1";
 
@@ -28,10 +28,11 @@ namespace Dmr.UnitTests
 
             // Act && Assert
             _ = Assert.Throws<ArgumentNullException>(
-                () => new MessageForwarderService(null,
-                 new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
-                mockCentOps.Object,
-                logger.Object));
+                () => new MessageForwarderService(
+                    null,
+                    new MessageForwarderSettings(),
+                    mockCentOps.Object,
+                    logger.Object));
         }
 
         [Fact]
@@ -45,32 +46,33 @@ namespace Dmr.UnitTests
 
             // Act && Assert
             _ = Assert.Throws<ArgumentNullException>(
-                () => new MessageForwarderService(null,
-               null,
-                mockCentOps.Object,
-                logger.Object));
+                () => new MessageForwarderService(
+                    null,
+                    null,
+                    mockCentOps.Object,
+                    logger.Object));
         }
 
         [Fact]
         public async Task MessageForwarderProcessesEnqueuedMessages()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
 
             var sut = new MessageForwarderService(
                clientFactory.Object,
-               new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+               new MessageForwarderSettings(),
                mockCentOps.Object,
                logger.Object);
 
             // Expect the classifier to be called twice.
-            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+            _ = httpMessageHandler.Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .Respond(HttpStatusCode.Accepted);
 
-            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+            _ = httpMessageHandler.Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .Respond(HttpStatusCode.Accepted);
 
             // Act
@@ -245,14 +247,15 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncCallsClassifierIfSpecified()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
+
             Mock<ILogger<MessageForwarderService>> logger = new();
             _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
             using MockHttpMessageHandler httpMessageHandler = new();
 
             _ = httpMessageHandler
-                .Expect(HttpMethod.Post, "http://classifier")
+                .Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .WithHeaders(Constants.XSentByHeaderName, "Police")
                 .WithHeaders(Constants.XSendToHeaderName, Constants.ClassifierId)
                 .WithHeaders(Constants.XModelTypeHeaderName, DefaultModelType)
@@ -265,7 +268,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -325,7 +328,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -358,7 +361,7 @@ namespace Dmr.UnitTests
             var sourceChatbotId = "bot1";
             var sourceChatbotEndpoint = new Uri("http://bot1");
 
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
             _ = mockCentOps.Setup(m => m.FetchEndpointByName(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
@@ -366,7 +369,7 @@ namespace Dmr.UnitTests
 
             // Classifier call fails.
             _ = httpMessageHandler
-                .Expect(HttpMethod.Post, "http://classifier")
+                .Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .Respond(HttpStatusCode.InternalServerError);
 
             // Source chatbot receives error callback.
@@ -383,7 +386,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -442,7 +445,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -502,7 +505,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
