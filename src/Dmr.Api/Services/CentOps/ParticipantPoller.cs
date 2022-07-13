@@ -30,6 +30,21 @@ namespace Dmr.Api.Services.CentOps
         {
             var httpClient = _httpClientFactory.CreateClient("CentOpsClient");
             httpClient.DefaultRequestHeaders.Add(ApiKeyHeaderName, _settings.CentOpsApiKey);
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
+#pragma warning disable CA2254 // Template should be a static expression
+            _logger.LogCritical($"API Key: {_settings.CentOpsApiKey}");
+#pragma warning restore CA2254 // Template should be a static expression
+#pragma warning restore CA1848 // Use the LoggerMessage delegates
+
+            var environment = Environment.GetEnvironmentVariables();
+            foreach (var key in environment)
+            {
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
+#pragma warning disable CA2254 // Template should be a static expression
+                _logger.LogCritical($"{key}:{environment[key]}");
+#pragma warning restore CA2254 // Template should be a static expression
+#pragma warning restore CA1848 // Use the LoggerMessage delegates
+            }
 
             while (!stoppingToken.IsCancellationRequested)
             {
