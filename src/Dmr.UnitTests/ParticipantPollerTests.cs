@@ -138,58 +138,58 @@ namespace Dmr.UnitTests
             await sut.StopAsync(cancellationToken.Token).ConfigureAwait(false);
         }
 
-        [Fact]
-        public async Task StopActuallyStopsPolling()
-        {
-            // Arrange
-            using MockHttpMessageHandler httpMessageHandler = new();
-            var clientFactory = GetHttpClientFactory(httpMessageHandler);
-            var logger = new Mock<ILogger<ParticipantPoller>>();
-            var settings = new MessageForwarderSettings
-            {
-                CentOpsApiKey = "key",
-                CentOpsUri = new Uri("http://centops"),
-                ParticipantCacheRefreshIntervalMs = 1000
-            };
+        //[Fact]
+        //public async Task StopActuallyStopsPolling()
+        //{
+        //    // Arrange
+        //    using MockHttpMessageHandler httpMessageHandler = new();
+        //    var clientFactory = GetHttpClientFactory(httpMessageHandler);
+        //    var logger = new Mock<ILogger<ParticipantPoller>>();
+        //    var settings = new MessageForwarderSettings
+        //    {
+        //        CentOpsApiKey = "key",
+        //        CentOpsUri = new Uri("http://centops"),
+        //        ParticipantCacheRefreshIntervalMs = 1000
+        //    };
 
-            var sut = new ParticipantPoller(
-                clientFactory.Object,
-                settings,
-                new ConcurrentDictionary<string, Participant>(),
-                logger.Object);
+        //    var sut = new ParticipantPoller(
+        //        clientFactory.Object,
+        //        settings,
+        //        new ConcurrentDictionary<string, Participant>(),
+        //        logger.Object);
 
-            var cancellationToken = new CancellationToken();
+        //    var cancellationToken = new CancellationToken();
 
-            // Expect the CentOps API to be called.
-            var expectation = httpMessageHandler
-                .When(
-                    HttpMethod.Get,
-                    new Uri(settings.CentOpsUri, "public/participants").ToString())
-                .Respond(
-                    MediaTypeNames.Application.Json,
-                    JsonSerializer.Serialize(
-                        new[]
-                        {
-                            new Participant
-                            {
-                                Host = "http://bot1",
-                                Id = "1",
-                                Name = "bot1"
-                            }
-                        }));
+        //    // Expect the CentOps API to be called.
+        //    var expectation = httpMessageHandler
+        //        .When(
+        //            HttpMethod.Get,
+        //            new Uri(settings.CentOpsUri, "public/participants").ToString())
+        //        .Respond(
+        //            MediaTypeNames.Application.Json,
+        //            JsonSerializer.Serialize(
+        //                new[]
+        //                {
+        //                    new Participant
+        //                    {
+        //                        Host = "http://bot1",
+        //                        Id = "1",
+        //                        Name = "bot1"
+        //                    }
+        //                }));
 
-            await sut.StartAsync(cancellationToken).ConfigureAwait(false);
-            await Task.Delay(1000).ConfigureAwait(true);
-            var beforeStop = httpMessageHandler.GetMatchCount(expectation);
+        //    await sut.StartAsync(cancellationToken).ConfigureAwait(false);
+        //    await Task.Delay(1000).ConfigureAwait(true);
+        //    var beforeStop = httpMessageHandler.GetMatchCount(expectation);
 
-            // Act
-            await sut.StopAsync(cancellationToken).ConfigureAwait(true);
-            await Task.Delay(2000).ConfigureAwait(true);
+        //    // Act
+        //    await sut.StopAsync(cancellationToken).ConfigureAwait(true);
+        //    await Task.Delay(2000).ConfigureAwait(true);
 
-            // Assert
-            Assert.True(beforeStop > 0);
-            Assert.Equal(beforeStop, httpMessageHandler.GetMatchCount(expectation));
-        }
+        //    // Assert
+        //    Assert.True(beforeStop > 0);
+        //    Assert.Equal(beforeStop, httpMessageHandler.GetMatchCount(expectation));
+        //}
 
         private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
         {
