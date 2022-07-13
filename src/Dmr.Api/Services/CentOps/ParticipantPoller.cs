@@ -1,5 +1,6 @@
 ﻿using Dmr.Api.Services.CentOps.Extensions;
 using Dmr.Api.Services.MessageForwarder;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 
@@ -36,18 +37,17 @@ namespace Dmr.Api.Services.CentOps
 #pragma warning restore CA2254 // Template should be a static expression
 #pragma warning restore CA1848 // Use the LoggerMessage delegates
 
-            var environment = Environment.GetEnvironmentVariables();
-            foreach (var key in environment)
-            {
-#pragma warning disable CA1848 // Use the LoggerMessage delegates
-#pragma warning disable CA2254 // Template should be a static expression
-                _logger.LogCritical($"{key}:{environment[key]}");
-#pragma warning restore CA2254 // Template should be a static expression
-#pragma warning restore CA1848 // Use the LoggerMessage delegates
-            }
-
             while (!stoppingToken.IsCancellationRequested)
             {
+                foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
+                {
+#pragma warning disable CA1848 // Use the LoggerMessage delegates
+#pragma warning disable CA2254 // Template should be a static expression
+                    _logger.LogCritical($"{de.Key}:{de.Value}");
+#pragma warning restore CA2254 // Template should be a static expression
+#pragma warning restore CA1848 // Use the LoggerMessage delegates
+                }
+
                 await RefreshCache(httpClient, stoppingToken).ConfigureAwait(false);
                 await Task
                     .Delay(
