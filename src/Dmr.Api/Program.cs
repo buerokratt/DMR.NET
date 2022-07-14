@@ -4,7 +4,7 @@ using Buerokratt.Common.CentOps;
 using Buerokratt.Common.CentOps.Interfaces;
 using Buerokratt.Common.CentOps.Models;
 using Dmr.Api.Services.MessageForwarder;
-using Dmr.Api.Services.MessageForwarder.Extensions;
+using Dmr.Api.Utils;
 
 namespace Dmr.Api
 {
@@ -22,12 +22,13 @@ namespace Dmr.Api
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
 
-            var dmrSettings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
+            var sectionName = "DmrServiceSettings";
+
+            var dmrSettings = builder.Configuration.GetSection(sectionName).Get<MessageForwarderSettings>();
             builder.Services.AddMessageForwarder(dmrSettings);
 
-            _ = builder.Services.AddHostedService<ParticipantPoller>();
-            _ = builder.Services.AddTransient<ICentOpsService, CentOpsService>();
-            _ = builder.Services.AddSingleton<ConcurrentDictionary<string, Participant>>();
+            var centOpsSettings = builder.Configuration.GetSection(sectionName).Get<CentOpsServiceSettings>();
+            builder.Services.AddParticipantPoller(centOpsSettings);
 
             var app = builder.Build();
 
