@@ -2,6 +2,8 @@
 using Dmr.Api.Services.MessageForwarder;
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Dmr.Api.Services.CentOps
 {
@@ -33,12 +35,20 @@ namespace Dmr.Api.Services.CentOps
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await RefreshCache(httpClient, stoppingToken).ConfigureAwait(false);
-                await Task
-                    .Delay(
-                        _settings.ParticipantCacheRefreshIntervalMs,
-                        stoppingToken)
-                    .ConfigureAwait(false);
+                try
+                {
+                    await RefreshCache(httpClient, stoppingToken).ConfigureAwait(false);
+                    await Task
+                        .Delay(
+                            _settings.ParticipantCacheRefreshIntervalMs,
+                            stoppingToken)
+                        .ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw;
+                }
             }
         }
 
@@ -46,8 +56,11 @@ namespace Dmr.Api.Services.CentOps
         {
             try
             {
+                var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+                options.Converters.Add(new JsonStringEnumConverter());
+
                 var centOpsParticipantsUri = new Uri(_settings.CentOpsUri!, PublicParticipantsEndpoint);
-                var participantList = await httpClient!.GetFromJsonAsync<IEnumerable<Participant>>(centOpsParticipantsUri, cancellationToken).ConfigureAwait(false);
+                var participantList = await httpClient!.GetFromJsonAsync<IEnumerable<Participant>>(centOpsParticipantsUri, options, cancellationToken).ConfigureAwait(false);
                 if (participantList != null)
                 {
                     _logger.RefreshingParticipantCache();
@@ -77,6 +90,10 @@ namespace Dmr.Api.Services.CentOps
             catch (HttpRequestException httpReqException)
             {
                 _logger.ParticipantCacheRefreshFailure(httpReqException);
+            }
+            catch (JsonException jsonException)
+            {
+                _logger.ParticipantCacheRefreshFailure(jsonException);
             }
         }
     }

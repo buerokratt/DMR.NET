@@ -19,5 +19,10 @@ namespace Dmr.Api.Services.CentOps
                     ? new Uri(participants[name].Host!)
                     : null);
         }
+
+        public Task<IEnumerable<Participant>> FetchParticipantsByType(ParticipantType type)
+        {
+            return Task.FromResult(participants.Values.Where(p => p.Type == type));
+        }
     }
 }

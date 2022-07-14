@@ -50,7 +50,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 // If classification is specified - forward to the classifier.
                 if (payload.Headers.XSendTo == Constants.ClassifierId)
                 {
-                    await SendMessageForClassification(payload.Payload, payload.Headers).ConfigureAwait(false);
+                    await ResolveClassifierAndSend(payload.Payload, payload.Headers).ConfigureAwait(false);
                     return;
                 }
 
@@ -100,18 +100,34 @@ namespace Dmr.Api.Services.MessageForwarder
             }
         }
 
-        private async Task SendMessageForClassification(string payload, HeadersInput headers)
+        private async Task ResolveClassifierAndSend(string payload, HeadersInput headers)
         {
             try
             {
+                var classifiers = await centOps.FetchParticipantsByType(ParticipantType.Classifier).ConfigureAwait(false);
+
+                if (!classifiers.Any())
+                {
+                    throw new KeyNotFoundException($"No Classifiers found.");
+                }
+
+                // For now - just select the first classifier.  This functionality will need to evolve.
+                var classifierInstance = classifiers.First();
+                var classifierUri = new Uri(classifierInstance.Host!);
+
                 using var content = GetDefaultRequestContent(payload, headers);
-                var response = await HttpClient.PostAsync(Config.ClassifierUri, content).ConfigureAwait(false);
+                var response = await HttpClient.PostAsync(classifierUri, content).ConfigureAwait(false);
                 _ = response.EnsureSuccessStatusCode();
             }
             catch (HttpRequestException httpReqException)
             {
                 Logger.ClassifierCallError(httpReqException);
                 throw new MessageForwarderException("Calling classifier failed.", httpReqException);
+            }
+            catch (KeyNotFoundException knfException)
+            {
+                Logger.ClassifierCallError(knfException);
+                throw new MessageForwarderException("No active classifiers found.", knfException);
             }
         }
 
@@ -129,7 +145,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 participantEndpoint = await centOps.FetchEndpointByName(headers.XSentBy).ConfigureAwait(false);
                 if (participantEndpoint == null)
                 {
-                    throw new KeyNotFoundException($"Participant with id '{headers.XSendTo}' not found");
+                    throw new KeyNotFoundException($"Participant with id '{headers.XSentBy}' not found");
                 }
 
                 using var content = GetDefaultRequestContent(string.Empty, headers);

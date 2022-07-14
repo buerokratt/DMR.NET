@@ -23,7 +23,7 @@ namespace Dmr.UnitTests
         {
             // Arrange
             var services = new ServiceCollection();
-            var settings = new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier"), CentOpsUri = new Uri("http://centops") };
+            var settings = new MessageForwarderSettings { CentOpsUri = new Uri("http://centops") };
 
             //Act
             ServiceCollectionExtensions.AddMessageForwarder(services, settings);

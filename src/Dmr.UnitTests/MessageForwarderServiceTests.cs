@@ -5,6 +5,7 @@ using Moq;
 using RequestProcessor.Models;
 using RichardSzalay.MockHttp;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace Dmr.UnitTests
     /// <summary>
     /// A collection of tests for the core DMR routing logic.
     /// </summary>
-    public class MessageForwarderServiceTests
+    public class MessageForwarderServiceTests : DmrBaseTest
     {
         private const string DefaultModelType = "application/vnd.buerokratt;version=1";
 
@@ -28,10 +29,11 @@ namespace Dmr.UnitTests
 
             // Act && Assert
             _ = Assert.Throws<ArgumentNullException>(
-                () => new MessageForwarderService(null,
-                 new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
-                mockCentOps.Object,
-                logger.Object));
+                () => new MessageForwarderService(
+                    null,
+                    new MessageForwarderSettings(),
+                    mockCentOps.Object,
+                    logger.Object));
         }
 
         [Fact]
@@ -45,32 +47,33 @@ namespace Dmr.UnitTests
 
             // Act && Assert
             _ = Assert.Throws<ArgumentNullException>(
-                () => new MessageForwarderService(null,
-               null,
-                mockCentOps.Object,
-                logger.Object));
+                () => new MessageForwarderService(
+                    null,
+                    null,
+                    mockCentOps.Object,
+                    logger.Object));
         }
 
         [Fact]
         public async Task MessageForwarderProcessesEnqueuedMessages()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
             Mock<ILogger<MessageForwarderService>> logger = new();
             using MockHttpMessageHandler httpMessageHandler = new();
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
 
             var sut = new MessageForwarderService(
                clientFactory.Object,
-               new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+               new MessageForwarderSettings(),
                mockCentOps.Object,
                logger.Object);
 
             // Expect the classifier to be called twice.
-            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+            _ = httpMessageHandler.Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .Respond(HttpStatusCode.Accepted);
 
-            _ = httpMessageHandler.Expect(HttpMethod.Post, "http://classifier")
+            _ = httpMessageHandler.Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .Respond(HttpStatusCode.Accepted);
 
             // Act
@@ -245,14 +248,15 @@ namespace Dmr.UnitTests
         public async Task ProcessRequestAsyncCallsClassifierIfSpecified()
         {
             // Arrange
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
+
             Mock<ILogger<MessageForwarderService>> logger = new();
             _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
             using MockHttpMessageHandler httpMessageHandler = new();
 
             _ = httpMessageHandler
-                .Expect(HttpMethod.Post, "http://classifier")
+                .Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .WithHeaders(Constants.XSentByHeaderName, "Police")
                 .WithHeaders(Constants.XSendToHeaderName, Constants.ClassifierId)
                 .WithHeaders(Constants.XModelTypeHeaderName, DefaultModelType)
@@ -265,7 +269,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -325,7 +329,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -348,6 +352,58 @@ namespace Dmr.UnitTests
             httpMessageHandler.VerifyNoOutstandingExpectation();
         }
 
+        [Fact]
+        public async Task ProcessRequestNotifiedCallerIfNoClassifiersFound()
+        {
+            // Arrange
+            var sourceChatbotId = "bot1";
+            var sourceChatbotEndpoint = new Uri("http://bot1");
+
+            var mockCentOps = new Mock<ICentOpsService>();
+
+            // No Classifiers found.
+            _ = mockCentOps.Setup(m => m.FetchParticipantsByType(ParticipantType.Classifier)).ReturnsAsync(Enumerable.Empty<Participant>());
+            _ = mockCentOps.Setup(m => m.FetchEndpointByName(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
+
+            Mock<ILogger<MessageForwarderService>> logger = new();
+            using MockHttpMessageHandler httpMessageHandler = new();
+
+            // Source chatbot receives error callback.
+            _ = httpMessageHandler
+                .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
+                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
+                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
+                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithContent(string.Empty)
+                .Respond(HttpStatusCode.Accepted);
+
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+
+            var sut = new MessageForwarderService(
+                clientFactory.Object,
+                new MessageForwarderSettings(),
+                mockCentOps.Object,
+                logger.Object);
+
+            // Act
+            await sut.ProcessRequestAsync(
+                    new Message
+                    {
+                        Payload = "Test Data",
+                        Headers = new HeadersInput
+                        {
+                            XSendTo = Constants.ClassifierId,
+                            XSentBy = sourceChatbotId,
+                            XMessageId = "2222",
+                            XMessageIdRef = "1111",
+                        }
+                    }).ConfigureAwait(true);
+
+            // Assert
+            httpMessageHandler.VerifyNoOutstandingExpectation();
+        }
+
         /// <summary>
         /// Notifies the caller of an error has occurred if calling the classifier fails.
         /// </summary>
@@ -358,7 +414,7 @@ namespace Dmr.UnitTests
             var sourceChatbotId = "bot1";
             var sourceChatbotEndpoint = new Uri("http://bot1");
 
-            var mockCentOps = new Mock<ICentOpsService>();
+            var mockCentOps = ConfigureMockCentOps();
             _ = mockCentOps.Setup(m => m.FetchEndpointByName(sourceChatbotId)).Returns(Task.FromResult(sourceChatbotEndpoint));
 
             Mock<ILogger<MessageForwarderService>> logger = new();
@@ -366,7 +422,7 @@ namespace Dmr.UnitTests
 
             // Classifier call fails.
             _ = httpMessageHandler
-                .Expect(HttpMethod.Post, "http://classifier")
+                .Expect(HttpMethod.Post, ClassifierParticipant.Host)
                 .Respond(HttpStatusCode.InternalServerError);
 
             // Source chatbot receives error callback.
@@ -383,7 +439,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -442,7 +498,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 
@@ -502,7 +558,7 @@ namespace Dmr.UnitTests
 
             var sut = new MessageForwarderService(
                 clientFactory.Object,
-                new MessageForwarderSettings { ClassifierUri = new Uri("http://classifier") },
+                new MessageForwarderSettings(),
                 mockCentOps.Object,
                 logger.Object);
 

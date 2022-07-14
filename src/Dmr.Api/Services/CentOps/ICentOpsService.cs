@@ -6,5 +6,7 @@
     public interface ICentOpsService
     {
         Task<Uri?> FetchEndpointByName(string name);
+
+        Task<IEnumerable<Participant>> FetchParticipantsByType(ParticipantType type);
     }
 }
