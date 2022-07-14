@@ -1,6 +1,6 @@
+using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Models;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Models;
 
 namespace Dmr.Api.Services.MessageForwarder.Extensions
 {

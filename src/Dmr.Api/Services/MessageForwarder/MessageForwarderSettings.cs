@@ -1,4 +1,4 @@
-using RequestProcessor.AsyncProcessor;
+using Buerokratt.Common.AsyncProcessor;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Dmr.Api.Services.MessageForwarder

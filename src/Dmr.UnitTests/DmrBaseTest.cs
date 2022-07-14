@@ -1,4 +1,5 @@
-﻿using Dmr.Api.Services.CentOps;
+﻿using Buerokratt.Common.CentOps.Interfaces;
+using Buerokratt.Common.CentOps.Models;
 using Moq;
 
 namespace Dmr.UnitTests
