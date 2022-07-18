@@ -1,8 +1,8 @@
 ﻿using Xunit;
 using Microsoft.Extensions.DependencyInjection;
-using Dmr.Api.Services.MessageForwarder.Extensions;
 using Dmr.Api.Services.MessageForwarder;
 using System;
+using Dmr.Api.Utils;
 
 namespace Dmr.UnitTests
 {
@@ -23,12 +23,12 @@ namespace Dmr.UnitTests
         {
             // Arrange
             var services = new ServiceCollection();
-            var settings = new MessageForwarderSettings { CentOpsUri = new Uri("http://centops") };
+            var settings = new MessageForwarderSettings();
 
-            //Act
+            // Act
             ServiceCollectionExtensions.AddMessageForwarder(services, settings);
 
-            //Assert
+            // Assert
             Assert.Contains(services, service => service.ServiceType.Name == "MessageForwarderSettings");
             Assert.Contains(services, service => service.ServiceType.Name == "AsyncProcessorSettings");
             Assert.Contains(services, service => service.ServiceType.Name.Contains("IAsyncProcessorService", StringComparison.InvariantCultureIgnoreCase));

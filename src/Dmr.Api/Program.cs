@@ -1,8 +1,7 @@
-using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using Dmr.Api.Services.CentOps;
+using Buerokratt.Common.CentOps;
 using Dmr.Api.Services.MessageForwarder;
-using Dmr.Api.Services.MessageForwarder.Extensions;
+using Dmr.Api.Utils;
 
 namespace Dmr.Api
 {
@@ -14,18 +13,17 @@ namespace Dmr.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             _ = builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
 
-            var dmrSettings = builder.Configuration.GetSection("DmrServiceSettings").Get<MessageForwarderSettings>();
+            // Add the Message Forwarder
+            var dmrSettings = builder.Configuration.GetSection(MessageForwarderSettings.SectionName).Get<MessageForwarderSettings>();
             builder.Services.AddMessageForwarder(dmrSettings);
 
-            _ = builder.Services.AddHostedService<ParticipantPoller>();
-            _ = builder.Services.AddTransient<ICentOpsService, CentOpsService>();
-            _ = builder.Services.AddSingleton<ConcurrentDictionary<string, Participant>>();
+            // Add the Participant Poller and related services.
+            var centOpsSettings = builder.Configuration.GetSection(MessageForwarderSettings.SectionName).Get<CentOpsServiceSettings>();
+            builder.Services.AddParticipantPoller(centOpsSettings);
 
             var app = builder.Build();
 

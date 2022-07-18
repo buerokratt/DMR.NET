@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Models;
+﻿using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
 namespace Dmr.Api.Controllers

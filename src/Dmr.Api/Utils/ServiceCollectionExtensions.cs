@@ -1,8 +1,9 @@
+﻿using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Models;
+using Dmr.Api.Services.MessageForwarder;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Models;
 
-namespace Dmr.Api.Services.MessageForwarder.Extensions
+namespace Dmr.Api.Utils
 {
     /// <summary>
     /// Extension class to help add all services related to the DMR
