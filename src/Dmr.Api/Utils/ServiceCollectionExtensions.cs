@@ -4,7 +4,6 @@ using Buerokratt.Common.CentOps.Interfaces;
 using Buerokratt.Common.CentOps.Models;
 using Buerokratt.Common.Models;
 using Dmr.Api.Services.MessageForwarder;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Concurrent;
 
 namespace Dmr.Api.Utils
@@ -31,9 +30,9 @@ namespace Dmr.Api.Utils
                 client.Timeout = TimeSpan.FromMilliseconds(settings.HttpRequestTimeoutMs);
             });
 
-            services.TryAddSingleton(settings);
-            services.TryAddSingleton(settings as AsyncProcessorSettings);
-            services.TryAddSingleton<IAsyncProcessorService<Message>, MessageForwarderService>();
+            _ = services.AddSingleton(settings);
+            _ = services.AddSingleton(settings as AsyncProcessorSettings);
+            _ = services.AddSingleton<IAsyncProcessorService<Message>, MessageForwarderService>();
             _ = services.AddHostedService<AsyncProcessorHostedService<Message>>();
         }
 
@@ -50,9 +49,9 @@ namespace Dmr.Api.Utils
             }
 
             _ = services.AddSingleton(settings);
-            _ = services.AddHostedService<ParticipantPoller>();
-            _ = services.AddTransient<ICentOpsService, CentOpsService>();
             _ = services.AddSingleton<ConcurrentDictionary<string, Participant>>();
+            _ = services.AddTransient<ICentOpsService, CentOpsService>();
+            _ = services.AddHostedService<ParticipantPoller>();
         }
     }
 }

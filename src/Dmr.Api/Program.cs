@@ -16,17 +16,17 @@ namespace Dmr.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             _ = builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
 
             var sectionName = "DmrServiceSettings";
 
+            // Add the Message Forwarder
             var dmrSettings = builder.Configuration.GetSection(sectionName).Get<MessageForwarderSettings>();
             builder.Services.AddMessageForwarder(dmrSettings);
 
+            // Add the Participant Poller and related services.
             var centOpsSettings = builder.Configuration.GetSection(sectionName).Get<CentOpsServiceSettings>();
             builder.Services.AddParticipantPoller(centOpsSettings);
 
