@@ -1,10 +1,6 @@
 ﻿using Buerokratt.Common.AsyncProcessor;
-using Buerokratt.Common.CentOps;
-using Buerokratt.Common.CentOps.Interfaces;
-using Buerokratt.Common.CentOps.Models;
 using Buerokratt.Common.Models;
 using Dmr.Api.Services.MessageForwarder;
-using System.Collections.Concurrent;
 
 namespace Dmr.Api.Utils
 {
@@ -34,24 +30,6 @@ namespace Dmr.Api.Utils
             _ = services.AddSingleton(settings as AsyncProcessorSettings);
             _ = services.AddSingleton<IAsyncProcessorService<Message>, MessageForwarderService>();
             _ = services.AddHostedService<AsyncProcessorHostedService<Message>>();
-        }
-
-        /// <summary>
-        /// Helper extension to configure IOC container with <see cref="ParticipantPoller"/> Service and associated services.
-        /// </summary>
-        /// <param name="services">The services collection that <see cref="ParticipantPoller"/> and related services will be added to.</param>
-        /// <param name="settings">A settings object for the <see cref="ParticipantPoller"/></param>
-        public static void AddParticipantPoller(this IServiceCollection services, CentOpsServiceSettings settings)
-        {
-            if (settings == null)
-            {
-                throw new ArgumentNullException(nameof(settings));
-            }
-
-            _ = services.AddSingleton(settings);
-            _ = services.AddSingleton<ConcurrentDictionary<string, Participant>>();
-            _ = services.AddTransient<ICentOpsService, CentOpsService>();
-            _ = services.AddHostedService<ParticipantPoller>();
         }
     }
 }
