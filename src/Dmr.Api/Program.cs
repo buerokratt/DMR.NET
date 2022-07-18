@@ -17,14 +17,12 @@ namespace Dmr.Api
             _ = builder.Services.AddEndpointsApiExplorer();
             _ = builder.Services.AddSwaggerGen();
 
-            var sectionName = "DmrServiceSettings";
-
             // Add the Message Forwarder
-            var dmrSettings = builder.Configuration.GetSection(sectionName).Get<MessageForwarderSettings>();
+            var dmrSettings = builder.Configuration.GetSection(MessageForwarderSettings.SectionName).Get<MessageForwarderSettings>();
             builder.Services.AddMessageForwarder(dmrSettings);
 
             // Add the Participant Poller and related services.
-            var centOpsSettings = builder.Configuration.GetSection(sectionName).Get<CentOpsServiceSettings>();
+            var centOpsSettings = builder.Configuration.GetSection(MessageForwarderSettings.SectionName).Get<CentOpsServiceSettings>();
             builder.Services.AddParticipantPoller(centOpsSettings);
 
             var app = builder.Build();

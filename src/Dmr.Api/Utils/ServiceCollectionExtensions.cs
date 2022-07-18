@@ -1,6 +1,7 @@
 ﻿using Buerokratt.Common.AsyncProcessor;
 using Buerokratt.Common.Models;
 using Dmr.Api.Services.MessageForwarder;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dmr.Api.Utils
 {
@@ -26,9 +27,9 @@ namespace Dmr.Api.Utils
                 client.Timeout = TimeSpan.FromMilliseconds(settings.HttpRequestTimeoutMs);
             });
 
-            _ = services.AddSingleton(settings);
-            _ = services.AddSingleton(settings as AsyncProcessorSettings);
-            _ = services.AddSingleton<IAsyncProcessorService<Message>, MessageForwarderService>();
+            services.TryAddSingleton(settings);
+            services.TryAddSingleton(settings as AsyncProcessorSettings);
+            services.TryAddSingleton<IAsyncProcessorService<Message>, MessageForwarderService>();
             _ = services.AddHostedService<AsyncProcessorHostedService<Message>>();
         }
     }

@@ -6,5 +6,6 @@ namespace Dmr.Api.Services.MessageForwarder
     [ExcludeFromCodeCoverage]
     public class MessageForwarderSettings : AsyncProcessorSettings
     {
+        internal const string SectionName = "DmrServiceSettings";
     }
 }
