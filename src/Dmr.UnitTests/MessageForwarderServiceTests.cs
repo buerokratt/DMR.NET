@@ -83,7 +83,7 @@ namespace Dmr.UnitTests
                 Payload = "Test Data",
                 Headers = new HeadersInput
                 {
-                    XSendTo = Constants.ClassifierId,
+                    XSendTo = ParticipantIds.ClassifierId,
                     XSentBy = "Police",
                 }
             });
@@ -93,7 +93,7 @@ namespace Dmr.UnitTests
                 Payload = "Test Data",
                 Headers = new HeadersInput
                 {
-                    XSendTo = Constants.ClassifierId,
+                    XSendTo = ParticipantIds.ClassifierId,
                     XSentBy = "Police",
                 }
             });
@@ -258,12 +258,12 @@ namespace Dmr.UnitTests
 
             _ = httpMessageHandler
                 .Expect(HttpMethod.Post, ClassifierParticipant.Host)
-                .WithHeaders(Constants.XSentByHeaderName, "Police")
-                .WithHeaders(Constants.XSendToHeaderName, Constants.ClassifierId)
-                .WithHeaders(Constants.XModelTypeHeaderName, DefaultModelType)
-                .WithHeaders(Constants.ContentTypeHeaderName, "text/plain")
-                .WithHeaders(Constants.XMessageIdHeaderName, "2222")
-                .WithHeaders(Constants.XMessageIdRefHeaderName, "1111")
+                .WithHeaders(HeaderNames.XSentByHeaderName, "Police")
+                .WithHeaders(HeaderNames.XSendToHeaderName, ParticipantIds.ClassifierId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, DefaultModelType)
+                .WithHeaders(HeaderNames.ContentTypeHeaderName, "text/plain")
+                .WithHeaders(HeaderNames.XMessageIdHeaderName, "2222")
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "1111")
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -281,7 +281,7 @@ namespace Dmr.UnitTests
                         Payload = "Test Data",
                         Headers = new HeadersInput
                         {
-                            XSendTo = Constants.ClassifierId,
+                            XSendTo = ParticipantIds.ClassifierId,
                             XSentBy = "Police",
                             XModelType = DefaultModelType,
                             XMessageId = "2222",
@@ -318,12 +318,12 @@ namespace Dmr.UnitTests
 
             _ = httpMessageHandler
                 .Expect(HttpMethod.Post, chatbotEndpoint.ToString())
-                .WithHeaders(Constants.XSentByHeaderName, "Police")
-                .WithHeaders(Constants.XSendToHeaderName, chatbotId)
-                .WithHeaders(Constants.XModelTypeHeaderName, DefaultModelType)
-                .WithHeaders(Constants.ContentTypeHeaderName, "text/plain")
-                .WithHeaders(Constants.XMessageIdHeaderName, "2222")
-                .WithHeaders(Constants.XMessageIdRefHeaderName, "1111")
+                .WithHeaders(HeaderNames.XSentByHeaderName, "Police")
+                .WithHeaders(HeaderNames.XSendToHeaderName, chatbotId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, DefaultModelType)
+                .WithHeaders(HeaderNames.ContentTypeHeaderName, "text/plain")
+                .WithHeaders(HeaderNames.XMessageIdHeaderName, "2222")
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "1111")
                 .Respond(HttpStatusCode.Accepted);
 
             var clientFactory = GetHttpClientFactory(httpMessageHandler);
@@ -372,10 +372,10 @@ namespace Dmr.UnitTests
             // Source chatbot receives error callback.
             _ = httpMessageHandler
                 .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
-                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
-                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
-                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
-                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithHeaders(HeaderNames.XSentByHeaderName, ParticipantIds.DmrId)
+                .WithHeaders(HeaderNames.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, ModelTypes.Error)
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "2222")
                 .WithContent(string.Empty)
                 .Respond(HttpStatusCode.Accepted);
 
@@ -394,7 +394,7 @@ namespace Dmr.UnitTests
                         Payload = "Test Data",
                         Headers = new HeadersInput
                         {
-                            XSendTo = Constants.ClassifierId,
+                            XSendTo = ParticipantIds.ClassifierId,
                             XSentBy = sourceChatbotId,
                             XMessageId = "2222",
                             XMessageIdRef = "1111",
@@ -429,10 +429,10 @@ namespace Dmr.UnitTests
             // Source chatbot receives error callback.
             _ = httpMessageHandler
                 .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
-                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
-                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
-                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
-                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithHeaders(HeaderNames.XSentByHeaderName, ParticipantIds.DmrId)
+                .WithHeaders(HeaderNames.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, ModelTypes.Error)
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "2222")
                 .WithContent(string.Empty)
                 .Respond(HttpStatusCode.Accepted);
 
@@ -451,7 +451,7 @@ namespace Dmr.UnitTests
                         Payload = "Test Data",
                         Headers = new HeadersInput
                         {
-                            XSendTo = Constants.ClassifierId,
+                            XSendTo = ParticipantIds.ClassifierId,
                             XSentBy = sourceChatbotId,
                             XMessageId = "2222",
                             XMessageIdRef = "1111",
@@ -488,10 +488,10 @@ namespace Dmr.UnitTests
             // Source chatbot receives error callback.
             _ = httpMessageHandler
                 .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
-                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
-                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
-                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
-                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithHeaders(HeaderNames.XSentByHeaderName, ParticipantIds.DmrId)
+                .WithHeaders(HeaderNames.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, ModelTypes.Error)
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "2222")
                 .WithContent(string.Empty)
                 .Respond(HttpStatusCode.Accepted);
 
@@ -548,10 +548,10 @@ namespace Dmr.UnitTests
             // Source chatbot receives error callback.
             _ = httpMessageHandler
                 .Expect(HttpMethod.Post, sourceChatbotEndpoint.ToString())
-                .WithHeaders(Constants.XSentByHeaderName, Constants.DmrId)
-                .WithHeaders(Constants.XSendToHeaderName, sourceChatbotId)
-                .WithHeaders(Constants.XModelTypeHeaderName, Constants.ErrorContentType)
-                .WithHeaders(Constants.XMessageIdRefHeaderName, "2222")
+                .WithHeaders(HeaderNames.XSentByHeaderName, ParticipantIds.DmrId)
+                .WithHeaders(HeaderNames.XSendToHeaderName, sourceChatbotId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, ModelTypes.Error)
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "2222")
                 .WithContent(string.Empty)
                 .Respond(HttpStatusCode.Accepted);
 
