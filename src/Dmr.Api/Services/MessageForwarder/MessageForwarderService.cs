@@ -41,7 +41,7 @@ namespace Dmr.Api.Services.MessageForwarder
 
             if (string.IsNullOrEmpty(payload.Headers.XSentBy) || string.IsNullOrEmpty(payload.Headers.XSendTo))
             {
-                throw new ArgumentException($"Required headers {Constants.XSentByHeaderName} or {Constants.XSendToHeaderName} are missing.");
+                throw new ArgumentException($"Required headers {HeaderNames.XSentByHeaderName} or {HeaderNames.XSendToHeaderName} are missing.");
             }
 
             try
@@ -49,7 +49,7 @@ namespace Dmr.Api.Services.MessageForwarder
                 Logger.DmrRoutingStatus(payload.Headers.XSentBy, payload.Headers.XSendTo);
 
                 // If classification is specified - forward to the classifier.
-                if (payload.Headers.XSendTo == Constants.ClassifierId)
+                if (payload.Headers.XSendTo == ParticipantIds.ClassifierId)
                 {
                     await ResolveClassifierAndSend(payload.Payload, payload.Headers).ConfigureAwait(false);
                     return;
@@ -61,7 +61,7 @@ namespace Dmr.Api.Services.MessageForwarder
             catch (MessageForwarderException)
             {
                 // If something went wrong - notify the sender, only if it makes sense to do so.
-                if (payload.Headers.XSentBy != Constants.ClassifierId)
+                if (payload.Headers.XSentBy != ParticipantIds.ClassifierId)
                 {
                     await NotifySenderOfError(payload.Headers).ConfigureAwait(false);
                 }
@@ -152,14 +152,14 @@ namespace Dmr.Api.Services.MessageForwarder
                 using var content = GetDefaultRequestContent(string.Empty, headers);
 
                 // This error originates from the DMR and has a special X-Model-Type.
-                _ = content.Headers.Remove(Constants.XSendToHeaderName);
-                content.Headers.Add(Constants.XSendToHeaderName, headers.XSentBy);
-                _ = content.Headers.Remove(Constants.XSentByHeaderName);
-                content.Headers.Add(Constants.XSentByHeaderName, Constants.DmrId);
-                _ = content.Headers.Remove(Constants.XModelTypeHeaderName);
-                content.Headers.Add(Constants.XModelTypeHeaderName, Constants.ErrorContentType);
-                _ = content.Headers.Remove(Constants.XMessageIdRefHeaderName);
-                content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageId);
+                _ = content.Headers.Remove(HeaderNames.XSendToHeaderName);
+                content.Headers.Add(HeaderNames.XSendToHeaderName, headers.XSentBy);
+                _ = content.Headers.Remove(HeaderNames.XSentByHeaderName);
+                content.Headers.Add(HeaderNames.XSentByHeaderName, ParticipantIds.DmrId);
+                _ = content.Headers.Remove(HeaderNames.XModelTypeHeaderName);
+                content.Headers.Add(HeaderNames.XModelTypeHeaderName, ModelTypes.Error);
+                _ = content.Headers.Remove(HeaderNames.XMessageIdRefHeaderName);
+                content.Headers.Add(HeaderNames.XMessageIdRefHeaderName, headers.XMessageId);
 
                 var response = await HttpClient.PostAsync(participantEndpoint, content).ConfigureAwait(false);
                 _ = response.EnsureSuccessStatusCode();
@@ -177,11 +177,11 @@ namespace Dmr.Api.Services.MessageForwarder
         private static StringContent GetDefaultRequestContent(string payload, HeadersInput headers)
         {
             var content = new StringContent(payload, System.Text.Encoding.UTF8);
-            content.Headers.Add(Constants.XSendToHeaderName, headers.XSendTo);
-            content.Headers.Add(Constants.XSentByHeaderName, headers.XSentBy);
-            content.Headers.Add(Constants.XMessageIdHeaderName, headers.XMessageId);
-            content.Headers.Add(Constants.XMessageIdRefHeaderName, headers.XMessageIdRef);
-            content.Headers.Add(Constants.XModelTypeHeaderName, headers.XModelType);
+            content.Headers.Add(HeaderNames.XSendToHeaderName, headers.XSendTo);
+            content.Headers.Add(HeaderNames.XSentByHeaderName, headers.XSentBy);
+            content.Headers.Add(HeaderNames.XMessageIdHeaderName, headers.XMessageId);
+            content.Headers.Add(HeaderNames.XMessageIdRefHeaderName, headers.XMessageIdRef);
+            content.Headers.Add(HeaderNames.XModelTypeHeaderName, headers.XModelType);
 
             // Unless specified by the caller - use the text/plain mime type.
             _ = content.Headers.ContentType = MediaTypeHeaderValue.Parse(headers.ContentType ?? MediaTypeNames.Text.Plain);
