@@ -165,7 +165,7 @@ namespace Dmr.UnitTests
                         Payload = "Test Data",
                         Headers = new HeadersInput
                         {
-                            XSendTo = Constants.ClassifierId,
+                            XSendTo = ParticipantIds.ClassifierId,
                             XSentBy = sourceChatbotId,
                             XMessageId = "2222",
                             XMessageIdRef = "1111",
