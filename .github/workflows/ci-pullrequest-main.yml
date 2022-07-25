@@ -151,4 +151,10 @@ jobs:
       uses: docker/setup-buildx-action@v2
     
     - name: Docker Build
-      run: docker image build src/Dmr.Api/
+      run: docker image build src/Dmr.Api/ -t dmr
+
+    - name: Scan for vulnerabilities
+      uses: crazy-max/ghaction-container-scan@b5dc796ae2a0ab4338f6db67dd1041a1cf261c2c
+      with:
+        image: dmr
+        annotations: true
