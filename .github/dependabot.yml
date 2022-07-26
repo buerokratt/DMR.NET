@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/src/Dmr.Api/"
+    schedule:
+      interval: "daily"
+      time: "22:00"
+
+  - package-ecosystem: "nuget"
+    directory: "/src/DMR.Api/"
+    schedule:
+      interval: "daily"
+      time: "23:00"
+ 
+  - package-ecosystem: "nuget"
+    directory: "/src/Dmr.UnitTests/"
+    schedule:
+      interval: "daily"
+      time: "21:00"
+      
+  - package-ecosystem: "github-actions"
+    directory: "/.github/"
+    schedule:
+      interval: "daily"
+      time: "20:00"
