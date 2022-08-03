@@ -41,9 +41,9 @@ Configuration of this service can be done in many ways.  [appsettings.json](../.
 
 | Setting    | Purpose                  |  appsettings.json | yaml environment |
 |-----------|-------------------------| ------------------|--------|
-| CentOpsUri | Specifies the end point for the CentOps service  |"CentOpsUri": "`https://centops`" | DMRSERVICESETTINGS__CENTOPSURI=`https://centops`
-| CentOpsApiKey | The Participant key for this registered DMR instance| "CentOpsApiKey": "`ParticipantKey`" | DMRSERVICESETTINGS__CENTOPSAPIKEY=`ParticipantKey`
-| ParticipantCacheRefreshIntervalMs | The interval at which to update the CentOps participant cache (5000ms by default) | "ParticipantCacheRefreshIntervalMs": `2000` | DMRSERVICESETTINGS__PARTICIPANTREFRESHINTERVAL=`2000`
+| CentOpsUri | Specifies the endpoint for the CentOps service |"CentOpsUri": "`https://centops`" | DMRSERVICESETTINGS__CENTOPSURI=`https://centops` |
+| CentOpsApiKey | The Participant key this DMR instance will use to communicate with CentOps | "CentOpsApiKey": "`ParticipantKey`" | DMRSERVICESETTINGS__CENTOPSAPIKEY=`ParticipantKey` |
+| ParticipantCacheRefreshIntervalMs | The interval at which to update the CentOps participant cache (5000ms by default) | "ParticipantCacheRefreshIntervalMs": `2000` | DMRSERVICESETTINGS__PARTICIPANTREFRESHINTERVAL=`2000` |
 
 ## Notes
 
