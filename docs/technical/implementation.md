@@ -27,7 +27,7 @@ The implementation of DMR is reasonably straightforward.
 3. The enqueued request is dequeued and handled by the [MessageForwarderService.cs](../../src/Dmr.Api/Services/MessageForwarder/MessageForwarderService.cs) which is derived from the shared code in [Beurokratt.Common](https://github.com/buerokratt/Request-Processor).
 4. The request is then sent on to a third party based on the `X-Send-To` header.  This could be another participant or a Classifier.
    - This service maintains a cache of participants using the ParticipantPoller from the Buerokratt.Common package.  This polls CentOps for updates on a periodic, configurable interval.  
-   - Routing requests intended participants specified by `X-Send-To` will need to have a valid entry in this cache (which means they exist with the name specified and are currently 'Available' to receive traffic.) to succeed.
+   - Routing requests to intended participants specified by `X-Send-To` need to have a valid entry in this cache (which means they exist with the name specified and are currently 'Available' to receive traffic) to succeed.
    - The participant being called on the initiator's behalf receives the original message and will also return `Accepted` for asynchronous processing.
 5. In the event of an error attempting to call a participant (e.g. a missing destination participant or the participant returns an error when it's endpoint is called), DMR will respond directly to the participant who initiated the request (specified by the `X-Sent-By` header).
 
