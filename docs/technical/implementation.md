@@ -7,7 +7,7 @@ This repository currently houses an implementation of the DMR written in C# with
 .NET's [Web API](https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-6.0) is used to implement RESTful endpoints.
 APIs are implemented with 'Controllers' which represent the operations one might perform on an entity managed by this service.
 
-[Swagger](https://swagger.io/) implemented using the [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) library is used to produce OpenAPI Specs for the created APIs and will host a simple user interface to allow APIs within this project to be called when run in Debug mode.
+[Swagger](https://swagger.io/) implemented using the [Swashbuckle](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) library produces OpenAPI Specs for the API and generates a simple user interface that allows endpoints within this project to be called when run in Debug mode.
 
 [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/roslyn-analyzers) are used to ensure best practice is used in code styling and language usage.  Violations of these rules will cause build failures.
 
