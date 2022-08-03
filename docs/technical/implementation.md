@@ -47,4 +47,4 @@ Configuration of this service can be done in many ways.  [appsettings.json](../.
 
 ## Notes
 
-Another implementation of the DMR exists which uses Nginx [here](https://github.com/buerokratt/DMR-Nginx).  This may well become the prevailing implementation of DMR.
+Another implementation of the DMR exists which uses Nginx [here](https://github.com/buerokratt/DMR-Nginx).  However, at the time of writing the .NET implementation was the primary one being used.
